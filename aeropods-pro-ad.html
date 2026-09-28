@@ -20,8 +20,6 @@
   --acc:#0FB39B;            /* product-derived primary accent */
   --acc-2:#0A7F8C;          /* secondary accent */
   --acc-soft:rgba(15,179,155,.14);
-  --shadow-card:0 calc(var(--u,10px)*.35) calc(var(--u,10px)*1.5) rgba(18,22,26,.08);
-  --shadow-hero:0 calc(var(--u,10px)*1.2) calc(var(--u,10px)*3.2) rgba(18,22,26,.20);
 }
 html,body{height:100%}
 body{
@@ -37,6 +35,8 @@ body{
 .stage{position:relative;width:100%;display:flex;align-items:center;justify-content:center;padding:12px}
 .frame{
   --u:clamp(6.2px,4.05vw,16px);
+  --shadow-card:0 calc(var(--u)*.35) calc(var(--u)*1.5) rgba(18,22,26,.08);
+  --shadow-hero:0 calc(var(--u)*1.2) calc(var(--u)*3.2) rgba(18,22,26,.20);
   position:relative;width:100%;
   max-width:min(430px,calc((100svh - 24px) * 9 / 16));
   aspect-ratio:9/16;
@@ -47,7 +47,8 @@ body{
   isolation:isolate;
   container-type:size;
 }
-@supports (container-type:size){ .frame{ --u:clamp(7px,1.52cqh,17px) } }
+.inner{position:absolute;inset:0;overflow:hidden}
+@supports (container-type:size){ .inner{ --u:clamp(6.4px,1.42cqh,15px) } }
 
 .defs{position:absolute;width:0;height:0;overflow:hidden}
 
@@ -157,20 +158,21 @@ body{
 .s1 .h1{margin-bottom:calc(var(--u)*1.1)}
 
 /* ---------- scene 2 ---------- */
-.s2 .p-stage{height:calc(var(--u)*13);margin:calc(var(--u)*1) 0 calc(var(--u)*.6)}
+.s2 .p-stage{height:calc(var(--u)*9.5);margin:calc(var(--u)*.4) 0 calc(var(--u)*.4)}
 .s2 .floor-glow{width:52%;padding-bottom:52%;top:62%;opacity:.8}
-.s2 .head{margin-bottom:calc(var(--u)*1.8)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*1.1);margin-top:calc(var(--u)*1.4)}
+.s2 .head{margin-bottom:calc(var(--u)*.8)}
+.s2 .h2{font-size:calc(var(--u)*3.9)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*.95);margin-top:calc(var(--u)*.9)}
 .card{
-  position:relative;border-radius:calc(var(--u)*1.9);padding:calc(var(--u)*1.5) calc(var(--u)*1.4);
+  position:relative;border-radius:calc(var(--u)*1.7);padding:calc(var(--u)*1.15) calc(var(--u)*1.1);
   background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow-card);
   -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
 }
-.card .n{font:700 calc(var(--u)*1.9)/1 'Sora',sans-serif;color:var(--acc-2);letter-spacing:-.02em;display:block;margin-bottom:calc(var(--u)*.6)}
-.card .t{font:600 calc(var(--u)*2.45)/1.18 'Sora',sans-serif;color:var(--ink);display:block;letter-spacing:-.015em}
-.card .d{font-size:calc(var(--u)*2.05);line-height:1.34;color:var(--ink-2);margin-top:calc(var(--u)*.5);display:block}
-.card::after{content:"";position:absolute;left:calc(var(--u)*1.4);top:calc(var(--u)*1.5);width:calc(var(--u)*1.5);height:2px;border-radius:2px;background:linear-gradient(90deg,var(--acc),var(--acc-2));opacity:.7}
-.foot-note{margin-top:calc(var(--u)*1.3);font-size:calc(var(--u)*1.85);color:var(--ink-3)}
+.card .n{font:700 calc(var(--u)*1.7)/1 'Sora',sans-serif;color:var(--acc-2);letter-spacing:-.02em;display:block;margin-bottom:calc(var(--u)*.45)}
+.card .t{font:600 calc(var(--u)*2.25)/1.15 'Sora',sans-serif;color:var(--ink);display:block;letter-spacing:-.015em}
+.card .d{font-size:calc(var(--u)*1.92);line-height:1.32;color:var(--ink-2);margin-top:calc(var(--u)*.42);display:block}
+.card::after{content:"";position:absolute;left:calc(var(--u)*1.1);top:calc(var(--u)*1.15);width:calc(var(--u)*1.4);height:2px;border-radius:2px;background:linear-gradient(90deg,var(--acc),var(--acc-2));opacity:.7}
+.foot-note{margin-top:calc(var(--u)*.9);font-size:calc(var(--u)*1.72);color:var(--ink-3)}
 
 /* ---------- scene 3 ---------- */
 .s3 .stage-wrap{position:relative;flex:1 1 auto;display:flex;align-items:center;justify-content:center;overflow:hidden}
@@ -240,6 +242,7 @@ body{
 
 <div class="stage">
   <div class="frame" id="frame">
+    <div class="inner">
 
     <!-- ===== product asset (single source of truth, reused in every scene) ===== -->
     <svg class="defs" aria-hidden="true" focusable="false">
@@ -406,6 +409,7 @@ body{
       </svg>
     </button>
 
+    </div>
   </div>
 </div>
 
@@ -426,10 +430,10 @@ const CONFIG = {
   benefitsEyebrow: 'FOYDALARI',
   benefitsTitle: 'Nima uchun AeroPods Pro?',
   features: [           // umumiy foyda namunalari — o‘z ma’lumotingiz bilan almashtiring
-    { t: 'Toza ovoz',   d: 'Kundalik tinglash uchun yumshoq va aniq balans.' },
-    { t: 'Uzluksiz ish', d: 'Kun davomida musiqani uzib tushirmasdan tinglang.' },
-    { t: 'Qulay taqish',d: 'Yengil dizayn — kunning butun davomida.' },
-    { t: 'Barqaror aloqa', d: 'Telefon bilan uzluksiz va ishonchli bog‘lanish.' }
+    { t: 'Toza ovoz',     d: 'Yumshoq va aniq eshitish.' },
+    { t: 'Uzluksiz ish',  d: 'Kun davomida uzluksiz musiqa.' },
+    { t: 'Qulay taqish',  d: 'Yengil, uzoq taqiladigan dizayn.' },
+    { t: 'Barqaror aloqa', d: 'Uzluksiz, barqaror bog‘lanish.' }
   ],
 
   experienceEyebrow: 'TAJRIBA',
