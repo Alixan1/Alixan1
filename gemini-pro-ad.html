@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gemini Pro — 18 oy · 20.000 so‘m</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   1) ASOSIY O'LCHOVLAR / TOKENS
+   ============================================================ */
+:root{
+  --a:#4285F4;           /* mahsulot brend rangi — ko'k */
+  --b:#9B72CB;           /* siyohrang */
+  --c:#E566A6;           /* pushti */
+  --ink:#0F1220;
+  --ink-soft:#4A5268;
+  --line:rgba(15,18,32,.10);
+  --card:rgba(255,255,255,.82);
+  --bg:#F7F8FC;
+  --shadow-card:0 6px 20px -10px rgba(15,18,32,.22);
+  --shadow-hero:0 30px 70px -28px rgba(15,18,32,.42);
+  --font-head:'Sora',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:var(--font-body);
+  color:var(--ink);
+  background:radial-gradient(1200px 800px at 50% 0%,#15182A 0%,#0A0C14 60%,#06070C 100%);
+  display:grid;place-items:center;overflow:hidden;
+}
+
+/* ============================================================
+   2) KADRLI 9:16 SAHNA
+   ============================================================ */
+.stage{position:relative;display:grid;place-items:center;width:100%;height:100%}
+.frame{
+  position:relative;
+  width:min(100%, calc(100dvh * 9 / 16));
+  aspect-ratio:9/16;
+  max-width:440px;
+  overflow:hidden;
+  container-type:size;
+  background:var(--bg);
+  isolation:isolate;
+  border-radius:clamp(0px,2.2vmin,18px);
+  box-shadow:0 40px 120px -40px rgba(0,0,0,.85);
+  touch-action:manipulation;
+}
+
+/* fon qatlamlari */
+.base-wash{position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(120% 80% at 50% 8%, #FFFFFF 0%, #F4F6FD 46%, #EDEFF9 100%),
+    linear-gradient(180deg,#FBFCFF 0%,#F2F4FC 60%,#E9ECF8 100%);
+}
+.blob{position:absolute;border-radius:50%;filter:blur(46px);opacity:.5;will-change:transform;pointer-events:none}
+.blob-1{width:66%;padding-bottom:66%;left:-24%;top:-14%;background:radial-gradient(circle at 40% 40%, rgba(66,133,244,.62), rgba(66,133,244,0) 68%)}
+.blob-2{width:60%;padding-bottom:60%;right:-20%;top:8%;background:radial-gradient(circle at 60% 40%, rgba(155,114,203,.52), rgba(155,114,203,0) 68%)}
+.blob-3{width:74%;padding-bottom:74%;left:6%;bottom:-26%;background:radial-gradient(circle at 50% 50%, rgba(229,102,166,.40), rgba(229,102,166,0) 70%)}
+.vignette{position:absolute;inset:0;z-index:6;pointer-events:none;
+  background:radial-gradient(130% 90% at 50% 44%, rgba(0,0,0,0) 52%, rgba(9,11,22,.16) 100%);
+}
+.grain{position:absolute;inset:-40px;z-index:7;pointer-events:none;opacity:.045;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='180' height='180' filter='url(%23n)'/></svg>");
+}
+#fx{position:absolute;inset:0;z-index:5;pointer-events:none}
+
+/* ============================================================
+   3) PROGRESS + OVOZ TUGMASI
+   ============================================================ */
+.progress{position:absolute;z-index:20;left:0;right:0;top:calc(10px + var(--safe-t));display:flex;gap:5px;padding:0 6px}
+.pbar{flex:1;height:3px;border-radius:99px;background:rgba(15,18,32,.13);overflow:hidden}
+.pbar span{display:block;height:100%;width:0%;border-radius:99px;
+  background:linear-gradient(90deg,var(--a),var(--b) 52%,var(--c));}
+.sound{position:absolute;z-index:22;right:10px;bottom:calc(10px + var(--safe-b));width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--line);background:rgba(255,255,255,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow-card);color:var(--ink)}
+.sound svg{width:16px;height:16px;display:block}
+.sound .ic-off{display:none}
+.sound[aria-pressed="false"] .ic-on{display:none}
+.sound[aria-pressed="false"] .ic-off{display:block}
+
+/* ============================================================
+   4) SAHNALAR
+   ============================================================ */
+.scenes{position:absolute;inset:0;z-index:10}
+.scene{position:absolute;inset:0;opacity:0;visibility:hidden;pointer-events:none;
+  padding:calc(46px + var(--safe-t)) 22px calc(30px + var(--safe-b));
+  display:flex;flex-direction:column;will-change:opacity,visibility}
+.scene.on{opacity:1;visibility:visible;pointer-events:auto}
+.pad{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1;will-change:transform}
+
+.wrap{position:relative;display:flex;flex-direction:column;height:100%;width:100%}
+.center{align-items:center;justify-content:center;text-align:center}
+
+/* tipografika */
+.eyebrow{font-family:var(--font-body);font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  font-size:11px;color:var(--ink-soft);background:rgba(255,255,255,.7);border:1px solid var(--line);
+  padding:6px 12px;border-radius:99px;box-shadow:var(--shadow-card);white-space:nowrap}
+h1{font-family:var(--font-head);font-weight:800;letter-spacing:-.035em;line-height:1.02;
+  font-size:40px;color:var(--ink);background:linear-gradient(120deg,var(--a),var(--b) 48%,var(--c));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--ink)}
+h2{font-family:var(--font-head);font-weight:700;letter-spacing:-.028em;line-height:1.1;font-size:27px;color:var(--ink)}
+.lead{font-size:15px;line-height:1.5;color:var(--ink-soft);font-weight:400;max-width:24ch}
+.lead.wide{max-width:none}
+.statement{font-family:var(--font-head);font-weight:700;letter-spacing:-.03em;line-height:1.18;font-size:28px;color:var(--ink)}
+.muted{font-size:13px;line-height:1.55;color:var(--ink-soft)}
+
+/* narx */
+.price{font-family:var(--font-head);font-weight:800;letter-spacing:-.045em;line-height:.94;
+  font-size:74px;color:transparent;background:linear-gradient(115deg,var(--a) 0%,var(--b) 50%,var(--c) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.price .cur{font-size:.36em;letter-spacing:-.01em;font-weight:700;margin-left:.18em}
+.chip{font-size:12.5px;font-weight:600;color:var(--ink);background:rgba(255,255,255,.8);
+  border:1px solid var(--line);border-radius:99px;padding:7px 13px;box-shadow:var(--shadow-card);white-space:nowrap}
+.row{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+
+/* kartalar */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;
+  box-shadow:var(--shadow-card);text-align:left;display:flex;gap:9px;align-items:flex-start}
+.card .ic{flex:0 0 auto;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;
+  background:linear-gradient(140deg,rgba(66,133,244,.14),rgba(229,102,166,.14));color:var(--ink)}
+.card .ic svg{width:14px;height:14px;display:block}
+.card h3{font-family:var(--font-head);font-size:12.5px;font-weight:700;letter-spacing:-.01em;color:var(--ink);margin-bottom:3px}
+.card p{font-size:11px;line-height:1.4;color:var(--ink-soft)}
+
+/* ro'yxat */
+.list{display:flex;flex-direction:column;gap:8px;width:100%}
+.li{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
+  border-radius:13px;padding:10px 12px;box-shadow:var(--shadow-card);text-align:left}
+.li .tick{flex:0 0 auto;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;
+  background:linear-gradient(140deg,var(--a),var(--c));color:#fff}
+.li .tick svg{width:10px;height:10px;display:block}
+.li span{font-size:12.5px;line-height:1.35;color:var(--ink);font-weight:500}
+
+/* CTA */
+.cta{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  font-family:var(--font-head);font-weight:700;font-size:16px;letter-spacing:-.01em;color:#fff;
+  text-decoration:none;padding:16px 30px;border-radius:99px;width:100%;
+  background:linear-gradient(115deg,var(--a) 0%,var(--b) 55%,var(--c) 100%);
+  box-shadow:0 18px 38px -16px rgba(80,80,200,.65), inset 0 1px 0 rgba(255,255,255,.28);
+  overflow:hidden;border:0;cursor:pointer}
+.cta::after{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;
+  background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.34),rgba(255,255,255,0));
+  transform:skewX(-18deg);animation:sheen 4.6s ease-in-out .9s infinite}
+@keyframes sheen{0%,62%{left:-60%}100%{left:130%}}
+.cta svg{width:17px;height:17px;flex:0 0 auto}
+.glowring{position:absolute;inset:0;border-radius:99px;pointer-events:none;
+  box-shadow:0 0 0 0 rgba(155,114,203,.42);will-change:transform,opacity}
+
+/* ============================================================
+   5) CSS MAHSULOT VIZUALI (NO-PHOTO rejim)
+   ============================================================ */
+.hero{position:relative;display:grid;place-items:center;width:100%;flex:1;min-height:0}
+.core{position:relative;width:min(62%,230px);aspect-ratio:1;will-change:transform}
+.core .halo{position:absolute;inset:-42%;border-radius:50%;
+  background:radial-gradient(circle at 50% 45%, rgba(155,114,203,.30), rgba(66,133,244,.16) 45%, rgba(229,102,166,0) 70%);
+  filter:blur(6px)}
+.core .sphere{position:absolute;inset:0;border-radius:50%;overflow:hidden;
+  background:
+    radial-gradient(64% 52% at 32% 24%, rgba(255,255,255,.98), rgba(255,255,255,0) 60%),
+    conic-gradient(from 200deg, var(--a), var(--b), var(--c), var(--b), var(--a));
+  box-shadow:inset 0 -18px 40px rgba(24,18,60,.30), inset 0 10px 26px rgba(255,255,255,.55),
+             0 26px 56px -20px rgba(40,30,110,.55);}
+.core .sphere::after{content:"";position:absolute;inset:0;border-radius:50%;
+  background:linear-gradient(180deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,0) 34%, rgba(20,16,50,.18) 100%);
+  mix-blend-mode:soft-light}
+.core .sheen{position:absolute;left:14%;top:9%;width:34%;height:20%;border-radius:50%;
+  background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,0));
+  transform:rotate(-22deg);filter:blur(1.5px)}
+.core .star{position:absolute;inset:0;display:grid;place-items:center}
+.core .star svg{width:46%;height:46%;color:#fff;filter:drop-shadow(0 4px 14px rgba(40,20,90,.45))}
+.floor{position:absolute;left:50%;bottom:2%;width:74%;height:26px;transform:translateX(-50%);
+  border-radius:50%;background:radial-gradient(ellipse at 50% 50%, rgba(24,20,60,.34), rgba(24,20,60,0) 70%);
+  filter:blur(7px);will-change:transform,opacity}
+.mirror{position:absolute;left:50%;top:50%;width:70%;height:34%;transform:translateX(-50%);
+  pointer-events:none;opacity:.16;filter:blur(2px);
+  -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,.9),rgba(0,0,0,0) 72%);
+  mask-image:linear-gradient(180deg,rgba(0,0,0,.9),rgba(0,0,0,0) 72%)}
+.mirror img{display:block;width:100%;height:100%;object-fit:contain}
+
+/* sahnaga xos vizual qatlam */
+.viz{position:relative;width:100%;flex:1;min-height:0;display:grid;place-items:center}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(15,18,32,.09)}
+.ring.r1{width:74%;padding-bottom:74%}
+.ring.r2{width:96%;padding-bottom:96%;border-style:dashed;opacity:.6}
+
+/* reveal boshlang'ich holatlari (inline JS ham qo'yadi) */
+[data-in]{will-change:transform,opacity}
+
+@media (max-height:640px){
+  h1{font-size:34px}.statement{font-size:24px}.price{font-size:60px}
+  .lead{font-size:14px}.grid{gap:8px}
+}
+@supports (container-type:size){
+  @container (max-height:600px){
+    .scene{padding-top:calc(40px + var(--safe-t))}
+    h1{font-size:32px}.h2,h2{font-size:23px}.statement{font-size:23px}
+    .price{font-size:56px}.lead{font-size:13.5px}.core{width:min(52%,180px)}
+    .cta{padding:14px 26px;font-size:15px}
+  }
+}
+@container (max-height:520px){
+  .grid{grid-template-columns:1fr}
+  .core{width:min(44%,150px)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .blob{filter:blur(46px)}
+}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="frame" id="frame" role="region" aria-label="Gemini Pro reklama">
+
+    <!-- fon -->
+    <div class="base-wash" aria-hidden="true"></div>
+    <div class="blob blob-1" id="b1" aria-hidden="true"></div>
+    <div class="blob blob-2" id="b2" aria-hidden="true"></div>
+    <div class="blob blob-3" id="b3" aria-hidden="true"></div>
+    <canvas id="fx" aria-hidden="true"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <!-- progress -->
+    <div class="progress" id="progress" aria-hidden="true"></div>
+
+    <!-- sahnalar -->
+    <div class="scenes" id="scenes">
+
+      <!-- 1: HOOK -->
+      <section class="scene" data-scene="0" aria-hidden="true">
+        <div class="pad" data-cam="1.00,0.10"></div>
+        <div class="wrap center">
+          <div class="hero">
+            <div class="core" data-in="pop" data-dur="900" data-delay="120">
+              <div class="halo" data-amb="halo"></div>
+              <div class="sphere" data-amb="float">
+                <div class="sheen"></div>
+              </div>
+              <div class="star">
+                <svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
+                  <path d="M50 2c3 26 14 40 48 48-34 8-45 22-48 48-3-26-14-40-48-48 34-8 45-22 48-48Z"/>
+                </svg>
+              </div>
+              <div class="floor" data-amb="floor"></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:11px;padding-bottom:6px">
+            <span class="eyebrow" data-in="rise" data-dur="560" data-delay="260" data-sfx-type="badge" data-sfx-delay="260" data-cat>AI YORDAMCHI</span>
+            <h1 data-in="rise" data-dur="680" data-delay="400" data-sfx-type="headline" data-sfx-delay="400" data-name>Gemini Pro</h1>
+            <p class="lead" data-in="rise" data-dur="600" data-delay="740" data-sfx-type="subtext" data-sfx-delay="740" data-hero>Ish, o‘qish va yaratish uchun kuchli AI yordamchi</p>
+            <div class="row" data-in="rise" data-dur="560" data-delay="1040" data-sfx-type="price" data-sfx-delay="1040">
+              <span class="price" style="font-size:34px"><span data-price>20.000</span><span class="cur" data-currency>so‘m</span></span>
+              <span class="chip" data-duration>18 oy</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2: FAYDALAR -->
+      <section class="scene" data-scene="1" aria-hidden="true">
+        <div class="pad" data-cam="1.06,-0.06"></div>
+        <div class="wrap center">
+          <div class="viz" style="flex:0 0 auto;height:16%">
+            <div class="ring r1" data-amb="r1"></div>
+            <div class="ring r2" data-amb="r2"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:14px">
+            <span class="eyebrow" data-in="rise" data-dur="520" data-delay="200" data-sfx-type="badge" data-sfx-delay="200">NIMA BERADI</span>
+            <h2 data-in="rise" data-dur="620" data-delay="320" data-sfx-type="headline" data-sfx-delay="320">Nima uchun Pro?</h2>
+          </div>
+          <div class="grid" id="featureGrid"></div>
+        </div>
+      </section>
+
+      <!-- 3: TAJJIBA -->
+      <section class="scene" data-scene="2" aria-hidden="true">
+        <div class="pad" data-cam="1.12,0.04"></div>
+        <div class="wrap center">
+          <div class="viz">
+            <div class="core" data-in="pop" data-dur="950" data-delay="150" style="width:min(46%,170px)">
+              <div class="halo" data-amb="halo"></div>
+              <div class="sphere" data-amb="float2">
+                <div class="sheen"></div>
+              </div>
+              <div class="star">
+                <svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
+                  <path d="M50 2c3 26 14 40 48 48-34 8-45 22-48 48-3-26-14-40-48-48 34-8 45-22 48-48Z"/>
+                </svg>
+              </div>
+              <div class="floor" data-amb="floor"></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+            <span class="eyebrow" data-in="rise" data-dur="520" data-delay="220" data-sfx-type="badge" data-sfx-delay="220">TAJJIBA</span>
+            <p class="statement" data-in="rise" data-dur="700" data-delay="380" data-sfx-type="headline" data-sfx-delay="380" data-exp>Ish, o‘qish va yaratish — bitta suhbatda.</p>
+            <p class="lead wide" data-in="rise" data-dur="620" data-delay="820" data-sfx-type="subtext" data-sfx-delay="820" style="max-width:30ch" data-expsub>Kichik vazifadan katta loyihagacha — savolni yozing, tayyor javobni oling.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4: TAKLIF -->
+      <section class="scene" data-scene="3" aria-hidden="true">
+        <div class="pad" data-cam="1.04,0.08"></div>
+        <div class="wrap center">
+          <div class="viz" style="flex:0 0 auto;height:18%">
+            <div class="ring r1" data-amb="r1"></div>
+            <div class="ring r2" data-amb="r2"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:9px;margin-bottom:14px">
+            <span class="eyebrow" data-in="rise" data-dur="520" data-delay="200" data-sfx-type="badge" data-sfx-delay="200">TAKLIF</span>
+            <h2 data-in="wipe" data-dur="700" data-delay="320" data-sfx-type="headline" data-sfx-delay="320" data-offerTitle>18 oy uchun bitta to‘lov</h2>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+            <div class="row" data-in="pop" data-dur="760" data-delay="520" data-sfx-type="price" data-sfx-delay="520">
+              <span class="price"><span data-price>20.000</span><span class="cur" data-currency>so‘m</span></span>
+            </div>
+            <span class="chip" data-in="rise" data-dur="520" data-delay="760" data-sfx-type="subtext" data-sfx-delay="760" data-duration>18 oy</span>
+          </div>
+          <div class="list" id="offerList" style="margin-top:16px"></div>
+        </div>
+      </section>
+
+      <!-- 5: CTA -->
+      <section class="scene" data-scene="4" aria-hidden="true">
+        <div class="pad" data-cam="1.08,0.0"></div>
+        <div class="wrap center">
+          <div class="viz">
+            <div class="core" data-in="pop" data-dur="900" data-delay="140" style="width:min(42%,158px)">
+              <div class="halo" data-amb="halo"></div>
+              <div class="sphere" data-amb="float3">
+                <div class="sheen"></div>
+              </div>
+              <div class="star">
+                <svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
+                  <path d="M50 2c3 26 14 40 48 48-34 8-45 22-48 48-3-26-14-40-48-48 34-8 45-22 48-48Z"/>
+                </svg>
+              </div>
+              <div class="floor" data-amb="floor"></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:13px;width:100%">
+            <h1 style="font-size:32px" data-in="rise" data-dur="640" data-delay="300" data-sfx-type="headline" data-sfx-delay="300" data-name>Gemini Pro</h1>
+            <div class="row" data-in="rise" data-dur="540" data-delay="600" data-sfx-type="price" data-sfx-delay="600">
+              <span class="chip"><span data-price>20.000</span> <span data-currency>so‘m</span> · <span data-duration>18 oy</span></span>
+            </div>
+            <div style="position:relative;width:100%;max-width:300px" data-in="pop" data-dur="620" data-delay="880" data-sfx-type="cta" data-sfx-delay="880">
+              <span class="glowring" data-amb="ring" aria-hidden="true"></span>
+              <a class="cta" id="ctaBtn" href="#" target="_blank" rel="noopener">
+                <span data-cta>Hozir boshlash</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </a>
+            </div>
+            <p class="muted" data-in="rise" data-dur="560" data-delay="1220" data-sfx-type="subtext" data-sfx-delay="1220" data-footer style="max-width:28ch">Gemini Pro • 18 oy</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <button class="sound" id="soundBtn" type="button" aria-pressed="true" aria-label="Ovozni o‘chirish">
+      <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+      <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m16 9 5 6M21 9l-5 6"/></svg>
+    </button>
+
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   KONFIGURATSIYA — bu yeradagi maydonlarni o'zgartiring
+   ================================================================ */
+const CONFIG = {
+  brand: 'GOOGLE AI',
+  category: 'Sun’iy intellekt yordamchi',
+  product: 'Gemini Pro',
+  heroText: 'Ish, o‘qish va yaratish uchun kuchli AI yordamchi',
+  price: '20.000',
+  currency: 'so‘m',
+  duration: '18 oy',
+  /* 4 ta umumiy foyda — o'z taklifingizga moslab o'zgartirish mumkin */
+  features: [
+    { icon:'brain', title:'Keng bilim bazasi', text:'Savollarga izchil va chuqur javoblar.' },
+    { icon:'code',  title:'Kod bilan ishlash',  text:'Kod yozish, tuzatish va tushuntirishda yordam.' },
+    { icon:'pen',   title:'Matn va g‘oya',      text:'Matn yozish, tahlil va g‘oya ishlab chiqish.' },
+    { icon:'image', title:'Matn + rasm',        text:'Rasm va matnni birgalikda ishlatish.' }
+  ],
+  experience: 'Ish, o‘qish va yaratish — bitta suhbatda.',
+  experienceSub: 'Kichik vazifadan katta loyihagacha — savolni yozing, tayyor javobni oling.',
+  offerTitle: '18 oy uchun bitta to‘lov',
+  offerItems: ['18 oy davomida foydalanish', 'Pro darajasidagi imkoniyatlar', 'Qo‘llab-quvvatlash bilan'],
+  ctaText: 'Hozir boshlash',
+  ctaUrl: '#',                 /* haqiqiy havolani shu yerga yozing */
+  footer: 'Gemini Pro • 18 oy',
+  /* har sahna davomiyligi (ms) */
+  durations: [4000, 4500, 4000, 4500, 4000]
+};
+
+const P = CONFIG;                                   /* qisqa alias */
+const SCENES = [...document.querySelectorAll('.scene')];
+const N = SCENES.length;
+const DUR = P.durations.slice(0, N);
+while (DUR.length < N) DUR.push(4000);
+const TOTAL = DUR.reduce((a, b) => a + b, 0);
+const START = []; let acc = 0; for (let i = 0; i < N; i++) { START.push(acc); acc += DUR[i]; }
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ================================================================
+   MATN / KONTEKSTNI DOM'GA YOZISH
+   ================================================================ */
+const setAll = (sel, val) => document.querySelectorAll(sel).forEach(n => { n.textContent = val; });
+setAll('[data-name]', P.product);
+setAll('[data-price]', P.price);
+setAll('[data-currency]', P.currency);
+setAll('[data-duration]', P.duration);
+setAll('[data-hero]', P.heroText);
+setAll('[data-exp]', P.experience);
+setAll('[data-expsub]', P.experienceSub);
+setAll('[data-offerTitle]', P.offerTitle);
+setAll('[data-cta]', P.ctaText);
+setAll('[data-footer]', P.footer);
+document.getElementById('ctaBtn').setAttribute('href', P.ctaUrl || '#');
+if (!/^https?:|t\.me\//i.test(P.ctaUrl || '')) {
+  document.getElementById('ctaBtn').removeAttribute('target');
+}
+
+const ICONS = {
+  brain:'<path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-1 5.8V15a3 3 0 0 0 4 2.8V4Z"/><path d="M15 4a3 3 0 0 1 3 3 3 3 0 0 1 1 5.8V15a3 3 0 0 1-4 2.8V4Z"/>',
+  code:'<path d="m8 8-4 4 4 4M16 8l4 4-4 4M13 5l-2 14"/>',
+  pen:'<path d="M4 20h4l10-10a2.8 2.8 0 1 0-4-4L4 16v4Z"/><path d="M13 6l5 5"/>',
+  image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="m4 18 5-5 4 4 3-2 4 4"/>'
+};
+const stroke = p => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
+const check = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5 11-11"/></svg>';
+
+/* 2-sahna kartalari */
+const fg = document.getElementById('featureGrid');
+P.features.slice(0, 4).forEach((f, i) => {
+  const d = 620 + i * 190;
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.setAttribute('data-in', 'pop');
+  el.setAttribute('data-dur', 560);
+  el.setAttribute('data-delay', d);
+  el.setAttribute('data-sfx-type', 'feature');
+  el.setAttribute('data-sfx-delay', d);
+  el.innerHTML = '<span class="ic">' + stroke(ICONS[f.icon] || ICONS.brain) + '</span>' +
+                 '<span><h3>' + f.title + '</h3><p>' + f.text + '</p></span>';
+  fg.appendChild(el);
+});
+
+/* 4-sahna ro'yxati */
+const ol = document.getElementById('offerList');
+P.offerItems.slice(0, 4).forEach((t, i) => {
+  const d = 980 + i * 170;
+  const el = document.createElement('div');
+  el.className = 'li';
+  el.setAttribute('data-in', 'rise');
+  el.setAttribute('data-dur', 520);
+  el.setAttribute('data-delay', d);
+  el.setAttribute('data-sfx-type', 'feature');
+  el.setAttribute('data-sfx-delay', d);
+  el.innerHTML = '<span class="tick">' + check + '</span><span>' + t + '</span>';
+  ol.appendChild(el);
+});
+
+/* progress baloklari — faqat bir marta quriladi */
+const progress = document.getElementById('progress');
+const FILLS = [];
+for (let i = 0; i < N; i++) {
+  const b = document.createElement('div');
+  b.className = 'pbar';
+  const s = document.createElement('span');
+  b.appendChild(s);
+  progress.appendChild(b);
+  FILLS.push(s);
+}
+
+/* ================================================================
+   MATN KO'RINISH ANIMATSIYALARI (deterministik, inline style)
+   ================================================================ */
+const EASE = {
+  out:  t => 1 - Math.pow(1 - t, 3),
+  back: t => { const c1 = 1.35, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); },
+  soft: t => t * t * (3 - 2 * t)
+};
+const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+
+const revealers = SCENES.map(sc => Array.from(sc.querySelectorAll('[data-in]')));
+const cams = SCENES.map(sc => sc.querySelector('[data-cam]')).map(el => {
+  if (!el) return null;
+  const [s, y] = el.dataset.cam.split(',').map(Number);
+  return { el, s, y };
+});
+const ambs = [];
+document.querySelectorAll('[data-amb]').forEach(el => ambs.push({ el, kind: el.dataset.amb }));
+
+function applyReveals(i, lt) {
+  const list = revealers[i];
+  for (let k = 0; k < list.length; k++) {
+    const el = list[k];
+    const delay = +el.dataset.delay || 0;
+    const dur = +el.dataset.dur || 600;
+    if (REDUCED) {
+      el.style.opacity = lt >= delay ? '1' : '0';
+      el.style.transform = 'none';
+      el.style.clipPath = 'none';
+      continue;
+    }
+    const p = clamp01((lt - delay) / dur);
+    if (p <= 0) {
+      el.style.opacity = '0';
+      el.style.transform = el.dataset.in === 'pop' ? 'scale(.88)' : 'translate3d(0,26px,0)';
+      el.style.clipPath = 'none';
+      continue;
+    }
+    const type = el.dataset.in;
+    if (type === 'pop') {
+      el.style.opacity = String(clamp01(p * 1.6));
+      el.style.transform = 'scale(' + (0.88 + 0.12 * EASE.back(p)).toFixed(4) + ')';
+    } else if (type === 'wipe') {
+      el.style.opacity = String(clamp01(p * 2));
+      el.style.clipPath = 'inset(0 ' + ((1 - EASE.out(p)) * 100).toFixed(2) + '% 0 0)';
+      el.style.transform = 'translate3d(0,' + ((1 - EASE.out(p)) * 10).toFixed(2) + 'px,0)';
+    } else {
+      el.style.opacity = String(EASE.out(p));
+      el.style.transform = 'translate3d(0,' + ((1 - EASE.out(p)) * 26).toFixed(2) + 'px,0)';
+    }
+  }
+}
+
+/* fon va vizual qatlamlar — absolout vaqtdan deterministik */
+function applyAmbient(t, i, p, lt) {
+  if (REDUCED) return;
+  const s = t / 1000;
+  b1.style.transform = 'translate3d(' + (Math.sin(s * 0.21) * 5).toFixed(2) + '%,' + (Math.cos(s * 0.17) * 4).toFixed(2) + '%,0) scale(' + (1 + Math.sin(s * 0.13) * 0.05).toFixed(3) + ')';
+  b2.style.transform = 'translate3d(' + (Math.cos(s * 0.19) * 5).toFixed(2) + '%,' + (Math.sin(s * 0.23) * 5).toFixed(2) + '%,0) scale(' + (1 + Math.cos(s * 0.15) * 0.06).toFixed(3) + ')';
+  b3.style.transform = 'translate3d(' + (Math.sin(s * 0.14) * 6).toFixed(2) + '%,' + (Math.cos(s * 0.12) * 4).toFixed(2) + '%,0) scale(' + (1 + Math.sin(s * 0.17) * 0.05).toFixed(3) + ')';
+
+  const c = cams[i];
+  if (c) {
+    const push = c.s + (c.s - 1) * 0.34 * p;
+    const dy = c.y * (1 - 2 * p) * 34;
+    c.el.style.transform = 'translate3d(0,' + dy.toFixed(2) + 'px,0) scale(' + push.toFixed(4) + ')';
+  }
+  for (let k = 0; k < ambs.length; k++) {
+    const a = ambs[k], el = a.el, kind = a.kind;
+    if (kind === 'float')  el.style.transform = 'translate3d(0,' + (Math.sin(s * 0.9) * 7).toFixed(2) + 'px,0) rotate(' + (Math.sin(s * 0.5) * 1.6).toFixed(2) + 'deg)';
+    if (kind === 'float2') el.style.transform = 'translate3d(0,' + (Math.cos(s * 0.8) * 8).toFixed(2) + 'px,0) rotate(' + (Math.cos(s * 0.45) * 1.8).toFixed(2) + 'deg)';
+    if (kind === 'float3') el.style.transform = 'translate3d(0,' + (Math.sin(s * 0.75) * 6).toFixed(2) + 'px,0) rotate(' + (Math.sin(s * 0.42) * 1.4).toFixed(2) + 'deg)';
+    if (kind === 'floor') el.style.transform = 'translateX(-50%) scale(' + (1 - 0.05 * Math.sin(s * 0.9)).toFixed(3) + ')';
+    if (kind === 'halo')  el.style.opacity = (0.75 + 0.25 * Math.sin(s * 0.7)).toFixed(3);
+    if (kind === 'r1')    el.style.transform = 'rotate(' + (s * 6).toFixed(2) + 'deg)';
+    if (kind === 'r2')    el.style.transform = 'rotate(' + (-s * 3.4).toFixed(2) + 'deg) scale(' + (1 + 0.04 * Math.sin(s * 0.5)).toFixed(3) + ')';
+    if (kind === 'ring')  {
+      const q = (s * 0.55) % 2.4;
+      el.style.opacity = (0.5 * (1 - q / 2.4)).toFixed(3);
+      el.style.transform = 'scale(' + (0.92 + 0.14 * q).toFixed(3) + ')';
+    }
+  }
+  const ctaWrap = document.querySelector('[data-sfx-type="cta"]');
+  if (ctaWrap && i === 4) {
+    const sh = ctaWrap.querySelector('.glowring');
+    if (sh && !REDUCED) {
+      const q = (lt % 1800) / 1800;
+      sh.style.opacity = (0.45 * (1 - q)).toFixed(3);
+      sh.style.transform = 'scale(' + (0.98 + 0.1 * q).toFixed(3) + ')';
+    }
+  }
+}
+
+/* ================================================================
+   CANVAS ZARRALAR
+   ================================================================ */
+const cv = document.getElementById('fx'), cx = cv.getContext('2d');
+let CW = 0, CH = 0, DPR = 1;
+const parts = [];
+function sizeCanvas() {
+  const r = cv.getBoundingClientRect();
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  CW = r.width; CH = r.height;
+  cv.width = Math.round(CW * DPR); cv.height = Math.round(CH * DPR);
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  parts.length = 0;
+  const n = REDUCED ? 0 : Math.round(Math.min(42, (CW * CH) / 9000));
+  const cols = ['66,133,244', '155,114,203', '229,102,166'];
+  for (let i = 0; i < n; i++) {
+    parts.push({
+      x: Math.random() * CW, y: Math.random() * CH,
+      r: 0.7 + Math.random() * 1.9,
+      vx: (Math.random() - 0.5) * 0.006,
+      vy: -0.004 - Math.random() * 0.010,
+      ph: Math.random() * Math.PI * 2,
+      c: cols[i % 3]
+    });
+  }
+}
+function drawParts(t) {
+  if (!CW) return;
+  cx.clearRect(0, 0, CW, CH);
+  const s = t / 1000;
+  for (let i = 0; i < parts.length; i++) {
+    const p = parts[i];
+    p.x += p.vx; p.y += p.vy;
+    if (p.y < -6) { p.y = CH + 6; p.x = Math.random() * CW; }
+    if (p.x < -6) p.x = CW + 6; else if (p.x > CW + 6) p.x = -6;
+    const o = 0.10 + 0.10 * (0.5 + 0.5 * Math.sin(s * 0.6 + p.ph));
+    cx.beginPath();
+    cx.fillStyle = 'rgba(' + p.c + ',' + o.toFixed(3) + ')';
+    cx.arc(p.x, p.y, p.r, 0, 6.2832);
+    cx.fill();
+  }
+}
+addEventListener('resize', sizeCanvas);
+
+/* ================================================================
+   SAHNA DVIGATELI
+   ================================================================ */
+let cur = -1, t0 = 0, running = true, ltLast = 0;
+let lastT = -1;
+
+function showScene(i) {
+  for (let k = 0; k < N; k++) {
+    const on = k === i;
+    SCENES[k].classList.toggle('on', on);
+    SCENES[k].setAttribute('aria-hidden', on ? 'false' : 'true');
+  }
+  cur = i;
+}
+
+function renderAt(time) {
+  const t = ((time % TOTAL) + TOTAL) % TOTAL;
+  let i = N - 1;
+  for (let k = 0; k < N; k++) { if (t < START[k] + DUR[k]) { i = k; break; } }
+  const lt = t - START[i];
+  const p = clamp01(lt / DUR[i]);
+  ltLast = lt;
+
+  if (i !== cur) { showScene(i); onSceneChange(i); }
+
+  for (let k = 0; k < N; k++) {
+    const w = k < i ? 1 : k > i ? 0 : p;
+    FILLS[k].style.width = (w * 100).toFixed(2) + '%';
+  }
+  applyReveals(i, lt);
+  applyAmbient(t, i, p);
+  drawParts(t);
+  lastT = t;
+  return t;
+}
+
+/* ================================================================
+   WEB AUDIO — master gain, kompressor, low-pass, reverb
+   ================================================================ */
+const A = {
+  ctx: null, master: null, comp: null, lp: null, dry: null, wet: null, verb: null,
+  music: null, sfx: null, muted: false, on: true, ready: false,
+  timers: [], sched: null, step: 0, next: 0, disposed: false
+};
+const now = () => A.ctx.currentTime;
+
+function makeIR(seconds, decay) {
+  const rate = A.ctx.sampleRate, len = Math.max(1, (rate * seconds) | 0);
+  const buf = A.ctx.createBuffer(2, len, rate);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = buf.getChannelData(ch);
+    for (let i = 0; i < len; i++) {
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+    }
+  }
+  return buf;
+}
+
+function initAudio() {
+  if (A.ctx || A.disposed) return;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return;
+  A.ctx = new AC();
+  A.master = A.ctx.createGain(); A.master.gain.value = 0.0001;
+  A.comp = A.ctx.createDynamicsCompressor();
+  A.comp.threshold.value = -18; A.comp.knee.value = 22; A.comp.ratio.value = 5;
+  A.comp.attack.value = 0.006; A.comp.release.value = 0.24;
+  A.lp = A.ctx.createBiquadFilter(); A.lp.type = 'lowpass';
+  A.lp.frequency.value = 7200; A.lp.Q.value = 0.6;
+  A.verb = A.ctx.createConvolver(); A.verb.buffer = makeIR(1.9, 2.6);
+  A.wet = A.ctx.createGain(); A.wet.gain.value = 0.26;
+  A.dry = A.ctx.createGain(); A.dry.gain.value = 1;
+  A.music = A.ctx.createGain(); A.music.gain.value = 0.5;
+  A.sfx = A.ctx.createGain(); A.sfx.gain.value = 0.9;
+
+  A.music.connect(A.dry); A.music.connect(A.wet);
+  A.sfx.connect(A.dry); A.sfx.connect(A.wet);
+  A.dry.connect(A.lp); A.wet.connect(A.lp);
+  A.lp.connect(A.comp); A.comp.connect(A.master); A.master.connect(A.ctx.destination);
+
+  A.next = now() + 0.1;
+  A.sched = setInterval(schedule, 180);
+  A.ready = true;
+  applyMute(true);
+  if (A.ctx.state === 'suspended') A.ctx.resume();
+}
+
+function applyMute(instant) {
+  if (!A.ctx) return;
+  const t = now();
+  const target = A.muted ? 0.0001 : 0.85;
+  A.master.gain.cancelScheduledValues(t);
+  if (instant) A.master.gain.setValueAtTime(target, t);
+  else A.master.gain.exponentialRampToValueAtTime(target, t + 0.22);
+  if (A.muted) clearSfx();
+  if (!A.muted && A.ctx.state === 'suspended') A.ctx.resume();
+}
+
+/* --- tovush generatorlari --- */
+function tone(freq, t0, dur, gain, type, dest, glide) {
+  if (!A.ctx) return;
+  const o = A.ctx.createOscillator(), g = A.ctx.createGain();
+  o.type = type || 'sine';
+  o.frequency.setValueAtTime(freq, t0);
+  if (glide) o.frequency.exponentialRampToValueAtTime(Math.max(40, glide), t0 + dur * 0.9);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(gain, t0 + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g); g.connect(dest || A.sfx);
+  o.start(t0); o.stop(t0 + dur + 0.03);
+}
+
+function noise(t0, dur, gain, hp, lp) {
+  if (!A.ctx) return;
+  const rate = A.ctx.sampleRate, len = Math.max(64, (rate * dur) | 0);
+  const buf = A.ctx.createBuffer(1, len, rate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.2);
+  const src = A.ctx.createBufferSource(); src.buffer = buf;
+  const f1 = A.ctx.createBiquadFilter(); f1.type = 'highpass'; f1.frequency.value = hp;
+  const f2 = A.ctx.createBiquadFilter(); f2.type = 'lowpass'; f2.frequency.value = lp;
+  const g = A.ctx.createGain();
+  g.gain.setValueAtTime(gain, t0);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(f1); f1.connect(f2); f2.connect(g); g.connect(A.sfx);
+  src.start(t0); src.stop(t0 + dur + 0.02);
+}
+
+const SFX = {
+  badge:  t => { tone(1180, t, 0.10, 0.055, 'sine', A.sfx, 1480); tone(1760, t + 0.02, 0.08, 0.022, 'triangle'); },
+  headline:t => { tone(196, t, 0.20, 0.10, 'triangle', A.sfx, 232); noise(t, 0.09, 0.020, 900, 5200); },
+  subtext: t => { tone(523, t, 0.12, 0.048, 'sine', A.sfx, 587); },
+  price:   t => { tone(392, t, 0.22, 0.085, 'triangle', A.sfx, 523); tone(784, t + 0.05, 0.16, 0.035, 'sine'); },
+  feature: t => { tone(660, t, 0.09, 0.040, 'sine', A.sfx, 740); },
+  cta:     t => { [523, 659, 880].forEach((f, i) => tone(f, t + i * 0.045, 0.24, 0.055, 'triangle', A.sfx)); noise(t, 0.10, 0.016, 1400, 6000); },
+  whoosh:  t => { noise(t, 0.34, 0.030, 320, 4200); }
+};
+const PAGE_SFX = [
+  t => { [659, 880, 1174].forEach((f, i) => tone(f, t + i * 0.075, 0.30, 0.060, 'triangle', A.sfx)); SFX.whoosh(t); },
+  t => { tone(523, t, 0.34, 0.062, 'triangle', A.sfx, 784); SFX.whoosh(t + 0.02); },
+  t => { tone(330, t, 0.40, 0.058, 'sine', A.sfx, 440); tone(660, t + 0.08, 0.26, 0.026, 'triangle'); },
+  t => { tone(392, t, 0.46, 0.060, 'sine', A.sfx, 587); noise(t, 0.28, 0.018, 500, 3800); },
+  t => { [523, 784, 1046].forEach((f, i) => tone(f, t + i * 0.06, 0.40, 0.062, 'triangle', A.sfx)); SFX.whoosh(t); }
+];
+
+/* matn SFX jadvali — har sahna uchun oldindan hisoblanadi */
+const SFX_MAP = SCENES.map((sc, i) => {
+  const ev = [];
+  sc.querySelectorAll('[data-sfx-type]').forEach(el => {
+    ev.push({ at: +el.dataset.sfxDelay || 0, type: el.dataset.sfxType, seed: i * 7 + ev.length });
+  });
+  ev.sort((a, b) => a.at - b.at);
+  return { page: i, pageAt: 0, events: ev };
+});
+
+let sfxTimers = [];
+function clearSfx() { sfxTimers.forEach(clearTimeout); sfxTimers = []; }
+
+function playSfx(type, seed) {
+  if (!A.ready || A.muted || !A.ctx || A.ctx.state !== 'running') return;
+  const f = SFX[type];
+  if (!f) return;
+  const jit = 1 + (((seed || 0) * 37) % 11 - 5) / 500;   /* ±1% pitch varyatsiya */
+  f(now() + 0.01 * jit);
+}
+
+function onSceneChange(i) {
+  clearSfx();
+  if (!A.ready) return;
+  if (!A.muted && A.ctx.state === 'running') PAGE_SFX[i](now() + 0.02);
+  const ev = SFX_MAP[i].events;
+  for (let k = 0; k < ev.length; k++) {
+    const e = ev[k];
+    sfxTimers.push(setTimeout(() => playSfx(e.type, e.seed), Math.max(0, e.at)));
+  }
+}
+
+/* --- ambient musiqa: look-ahead scheduler --- */
+const CHORDS = [
+  [130.81, 196.00, 246.94, 329.63],  /* Cm-ish */
+  [110.00, 164.81, 220.00, 261.63],
+  [146.83, 220.00, 293.66, 349.23],
+  [123.47, 185.00, 246.94, 293.66]
+];
+const MEL = [659.25, 783.99, 880.00, 987.77, 783.99, 659.25, 587.33, 739.99];
+const LOOKAHEAD = 0.6, TICK = 180;
+let step = 0;
+
+function pad(t0, freqs, dur, vol) {
+  freqs.forEach((f, k) => {
+    const o = A.ctx.createOscillator(), g = A.ctx.createGain(), lp = A.ctx.createBiquadFilter();
+    o.type = 'triangle'; o.frequency.value = f * (k === 3 ? 2 : 1);
+    lp.type = 'lowpass'; lp.frequency.value = 900;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol / freqs.length, t0 + 0.9);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(lp); lp.connect(g); g.connect(A.music);
+    o.start(t0); o.stop(t0 + dur + 0.05);
+  });
+}
+function bassNote(t0, f, dur, vol) {
+  const o = A.ctx.createOscillator(), g = A.ctx.createGain();
+  o.type = 'sine'; o.frequency.value = f;
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(vol, t0 + 0.12);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g); g.connect(A.music);
+  o.start(t0); o.stop(t0 + dur + 0.05);
+}
+function schedule() {
+  if (!A.ready || !A.ctx || A.ctx.state !== 'running') return;
+  const t = now();
+  while (A.next < t + LOOKAHEAD) {
+    if (!A.muted) {
+      const chord = CHORDS[(step / 4 | 0) % CHORDS.length];
+      pad(A.next, chord, 4.2, 0.055);
+      if (step % 2 === 0) bassNote(A.next, chord[0] / 2, 2.6, 0.075);
+      if (step % 2 === 1) {
+        const f = MEL[(step / 2 | 0) % MEL.length];
+        const o = A.ctx.createOscillator(), g = A.ctx.createGain();
+        o.type = 'sine'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, A.next);
+        g.gain.exponentialRampToValueAtTime(0.026, A.next + 0.25);
+        g.gain.exponentialRampToValueAtTime(0.0001, A.next + 1.5);
+        o.connect(g); g.connect(A.music);
+        o.start(A.next); o.stop(A.next + 1.6);
+      }
+    }
+    A.next += 1.0;
+    step++;
+  }
+}
+
+/* ================================================================
+   OVOZ TUGMASI
+   ================================================================ */
+const sBtn = document.getElementById('soundBtn');
+let booted = false;
+function bootAudio() {
+  if (booted || !A.ready) return;
+  booted = true;
+  const t = now() + 0.02;
+  [523.25, 659.25, 987.77].forEach((f, i) => tone(f, t + i * 0.06, 0.55, 0.048, 'triangle', A.music));
+  SFX.whoosh(t);
+  SFX_MAP[0].events.forEach(e =>
+    sfxTimers.push(setTimeout(() => playSfx(e.type, e.seed), e.at)));
+}
+
+function firstInteraction() {
+  const wasMuted = A.muted;
+  initAudio();
+  if (!wasMuted) A.muted = false;
+  applyMute(true);
+  updateBtn();
+  if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume();
+  if (!wasMuted) bootAudio();
+  ['pointerdown', 'keydown', 'touchstart'].forEach(ev =>
+    removeEventListener(ev, firstInteraction, true));
+}
+['pointerdown', 'keydown', 'touchstart'].forEach(ev =>
+  addEventListener(ev, firstInteraction, true));
+
+function updateBtn() {
+  sBtn.setAttribute('aria-pressed', String(!A.muted));
+  sBtn.setAttribute('aria-label', A.muted ? 'Ovozni yo‘qish' : 'Ovozni o‘chirish');
+}
+sBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  initAudio();
+  A.muted = !A.muted;
+  applyMute(false);
+  updateBtn();
+});
+
+addEventListener('pagehide', () => {
+  A.disposed = true;
+  clearSfx();
+  if (A.sched) clearInterval(A.sched);
+  A.sched = null;
+  if (A.ctx) { try { A.ctx.close(); } catch (err) {} }
+  A.ctx = null; A.ready = false;
+});
+
+/* ================================================================
+   ASOSIY TSIKL
+   ================================================================ */
+const b1 = document.getElementById('b1'), b2 = document.getElementById('b2'), b3 = document.getElementById('b3');
+
+sizeCanvas();
+renderAt(0);
+t0 = performance.now();
+
+function frame(ts) {
+  if (running) {
+    const t = ts - t0;
+    renderAt(t);
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { running = false; }
+  else { running = true; t0 = performance.now() - (lastT || 0); }
+});
+
+/* MP4 eksport uchun ommaviy API */
+window.AdAPI = {
+  config: CONFIG, total: TOTAL, durations: DUR, start: START,
+  renderAt: (ms) => { running = false; renderAt(ms); },
+  play: () => { running = true; t0 = performance.now() - (lastT || 0); },
+  sfxEvents: () => {
+    const out = [];
+    for (let i = 0; i < N; i++) {
+      out.push({ t: START[i], type: 'page', scene: i });
+      SFX_MAP[i].events.forEach(e => out.push({ t: START[i] + e.at, type: e.type, scene: i }));
+    }
+    return out.sort((a, b) => a.t - b.t);
+  }
+};
+</script>
+</body>
+</html>
