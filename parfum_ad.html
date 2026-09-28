@@ -1,0 +1,235 @@
+<script>
+const CONFIG = {
+  productName: "Éclat d'Or",
+  category: "Luxury Parfum",
+  price: 189,
+  currency: "$",
+  features: ["Long Lasting", "Jasmine & Rose", "12h Trail", "Small Batch"],
+  experience: "When you wear Éclat d'Or, the world notices your presence",
+  ctaText: "Discover Now",
+  ctaUrl: "#",
+  supportText: "100% authentic & secure packaging",
+  sceneDurations: [4500, 4500, 4000, 4500, 4000],
+  loop: true
+};
+
+const state = {
+  currentScene: 0,
+  isPlaying: true,
+  isMuted: false,
+  sceneStartTime: 0,
+  lastTime: 0,
+  sceneTimer: null,
+  progressInterval: null,
+  audioCtx: null,
+  masterGain: null,
+  compressor: null,
+  ambientNodes: [],
+  textSfxTimers: [],
+  reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+};
+
+const sceneEls = document.querySelectorAll('.scene');
+const progressBars = document.querySelectorAll('.progress-bar');
+const soundBtn = document.getElementById('soundBtn');
+const soundIcon = document.getElementById('soundIcon');
+const frame = document.getElementById('frame');
+
+function initAudio() {
+  if (state.audioCtx) return;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return;
+  state.audioCtx = new AC();
+  state.masterGain = state.audioCtx.createGain();
+  state.masterGain.gain.value = state.isMuted ? 0 : 0.12;
+  state.compressor = state.audioCtx.createDynamicsCompressor();
+  state.compressor.threshold.value = -20;
+  state.compressor.knee.value = 10;
+  state.compressor.ratio.value = 4;
+  state.compressor.attack.value = 0.01;
+  state.compressor.release.value = 0.3;
+  const lowpass = state.audioCtx.createBiquadFilter();
+  lowpass.type = 'lowpass';
+  lowpass.frequency.value = 8000;
+  state.masterGain.connect(lowpass);
+  lowpass.connect(state.compressor);
+  state.compressor.connect(state.audioCtx.destination);
+  startAmbient();
+}
+
+function startAmbient() {
+  if (!state.audioCtx || state.ambientNodes.length > 0) return;
+  const now = state.audioCtx.currentTime;
+  const osc1 = state.audioCtx.createOscillator();
+  const gain1 = state.audioCtx.createGain();
+  osc1.type = 'sine'; osc1.frequency.value = 110;
+  gain1.gain.value = 0.04;
+  osc1.connect(gain1); gain1.connect(state.masterGain); osc1.start(now); osc1.stop(now + 30);
+
+  const osc2 = state.audioCtx.createOscillator();
+  const gain2 = state.audioCtx.createGain();
+  osc2.type = 'sine'; osc2.frequency.value = 165;
+  gain2.gain.value = 0.02;
+  osc2.connect(gain2); gain2.connect(state.masterGain); osc2.start(now); osc2.stop(now + 30);
+
+  state.ambientNodes = [osc1, osc2];
+}
+
+function stopAmbient() {
+  state.ambientNodes.forEach(n => { try { n.stop(); } catch(e){} });
+  state.ambientNodes = [];
+}
+
+function playTone(freq, duration, volume, type, delay) {
+  if (state.isMuted || !state.audioCtx) return;
+  const t = state.audioCtx.currentTime + (delay || 0) / 1000;
+  const osc = state.audioCtx.createOscillator();
+  const gain = state.audioCtx.createGain();
+  osc.type = type || 'sine';
+  osc.frequency.setValueAtTime(freq, t);
+  gain.gain.setValueAtTime(0, t);
+  gain.gain.linearRampToValueAtTime(volume, t + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + duration / 1000);
+  osc.connect(gain); gain.connect(state.masterGain);
+  osc.start(t); osc.stop(t + duration / 1000 + 0.05);
+  const id = setTimeout(() => { try { osc.stop(); } catch(e){} }, (duration + 100));
+  state.textSfxTimers.push(id);
+}
+
+function playTransitionSfx(sceneIndex) {
+  if (state.isMuted || !state.audioCtx) return;
+  const freqs = [523, 659, 784, 880, 1047];
+  const baseFreq = freqs[sceneIndex] || 523;
+  playTone(baseFreq, 150, 0.06, 'sine', 0);
+  setTimeout(() => playTone(baseFreq * 1.5, 100, 0.03, 'sine', 80), 60);
+}
+
+function scheduleSceneSfx(sceneIndex) {
+  clearTextSfxTimers();
+  const scene = sceneEls[sceneIndex];
+  if (!scene) return;
+  const elements = scene.querySelectorAll('[data-sfx-delay]');
+  elements.forEach(el => {
+    const delay = parseInt(el.getAttribute('data-sfx-delay'));
+    const type = el.getAttribute('data-sfx-type');
+    if (isNaN(delay)) return;
+    const timer = setTimeout(() => {
+      switch(type) {
+        case 'headline': playTone(440, 120, 0.04, 'sine', 0); break;
+        case 'subtext': playTone(520, 80, 0.025, 'triangle', 20); break;
+        case 'badge': playTone(660, 100, 0.03, 'sine', 0); setTimeout(() => playTone(880, 80, 0.02, 'sine', 60), 80); break;
+        case 'price': playTone(392, 200, 0.05, 'sine', 0); setTimeout(() => playTone(523, 150, 0.035, 'sine', 100), 100); break;
+        case 'feature': playTone(550, 70, 0.02, 'triangle', 0); break;
+        case 'cta': playTone(523, 200, 0.06, 'sine', 0); setTimeout(() => playTone(659, 150, 0.04, 'sine', 80), 100); setTimeout(() => playTone(784, 200, 0.05, 'sine', 180), 180); break;
+      }
+    }, delay);
+    state.textSfxTimers.push(timer);
+  });
+}
+
+function clearTextSfxTimers() {
+  state.textSfxTimers.forEach(id => clearTimeout(id));
+  state.textSfxTimers = [];
+}
+
+function updateProgress(dt) {
+  if (!state.isPlaying) return;
+  const sceneDur = CONFIG.sceneDurations[state.currentScene];
+  const elapsed = state.lastTime - state.sceneStartTime;
+  const progress = Math.min(elapsed / sceneDur, 1);
+  progressBars[state.currentScene].style.transform = `scaleX(${progress})`;
+}
+
+function showScene(index) {
+  sceneEls.forEach((s, i) => {
+    s.classList.toggle('active', i === index);
+  });
+  // Reset all progress bars
+  progressBars.forEach(bar => {
+    bar.style.transform = 'scaleX(0)';
+    bar.classList.remove('filled', 'active');
+  });
+  // Mark completed scenes
+  for (let i = 0; i < index; i++) {
+    progressBars[i].classList.add('filled');
+  }
+  // Mark current scene as active
+  progressBars[index].classList.add('active');
+  
+  state.currentScene = index;
+  state.sceneStartTime = performance.now();
+  
+  // Schedule SFX for new scene
+  scheduleSceneSfx(index);
+  playTransitionSfx(index);
+}
+
+function update() {
+  const now = performance.now();
+  const dt = now - state.lastTime;
+  state.lastTime = now;
+  
+  updateProgress(dt);
+  
+  // Check if we should advance scene
+  if (state.isPlaying) {
+    const sceneDur = CONFIG.sceneDurations[state.currentScene];
+    const elapsed = state.lastTime - state.sceneStartTime;
+    if (elapsed >= sceneDur) {
+      const nextScene = (state.currentScene + 1) % sceneEls.length;
+      showScene(nextScene);
+    }
+  }
+  
+  // Continue animation loop
+  requestAnimationFrame(update);
+}
+
+function toggleMute() {
+  state.isMuted = !state.isMuted;
+  if (state.masterGain) state.masterGain.gain.value = state.isMuted ? 0 : 0.12;
+  if (state.isMuted) {
+    soundIcon.innerHTML = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
+  } else {
+    soundIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
+    if (!state.audioCtx) initAudio();
+  }
+}
+
+// Event Listeners
+soundBtn.addEventListener('click', () => {
+  if (!state.audioCtx) initAudio();
+  toggleMute();
+});
+
+document.addEventListener('click', () => {
+  if (!state.audioCtx) initAudio();
+}, { once: true });
+
+document.addEventListener('touchstart', () => {
+  if (!state.audioCtx) initAudio();
+}, { once: true });
+
+frame.addEventListener('click', () => {
+  if (!state.audioCtx) initAudio();
+});
+
+window.addEventListener('pagehide', () => {
+  clearTextSfxTimers();
+  stopAmbient();
+  if (state.audioCtx) { state.audioCtx.close().catch(()=>{}); state.audioCtx = null; }
+});
+
+if (state.reducedMotion) {
+  document.documentElement.style.setProperty('--transition-speed', '0.01ms');
+}
+
+// Start the application
+function start() {
+  state.lastTime = performance.now();
+  showScene(0);
+  requestAnimationFrame(update);
+}
+
+start();
+</script>
