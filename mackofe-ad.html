@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MACKOFE — 24 s vertikal reklama</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   0) TOKENLAR (CONFIG.palette JS orqali qayta yoziladi)
+   ============================================================ */
+:root{
+  --bg:#FBF6F0; --bg2:#F1E4D6; --ink:#2A1D14; --inkSoft:#6E5947;
+  --accent:#A85A28; --accent2:#7A4520; --accentL:#C87A34;
+  --glow:rgba(168,90,40,.22);
+  --glass:rgba(255,255,255,.62);
+  --line:rgba(42,29,20,.10);
+  --fontH:"Sora","Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --fontB:"Inter","Sora",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --stageW:1080px; --stageH:1920px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#1A1109}
+body{font-family:var(--fontB);color:var(--ink);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+#stage{
+  position:absolute;left:50%;top:50%;width:var(--stageW);height:var(--stageH);
+  transform-origin:50% 50%;overflow:hidden;background:var(--bg);isolation:isolate;
+  contain:paint;
+}
+/* ============================================================
+   1) QATLAMLAR
+   ============================================================ */
+#bg{position:absolute;inset:0;z-index:0;pointer-events:none}
+#blobs{position:absolute;inset:-12%;z-index:1;pointer-events:none}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);will-change:transform}
+#tiles{position:absolute;inset:0;z-index:2;pointer-events:none}
+.tile{position:absolute;border-radius:26px;background:rgba(255,255,255,.42);
+  border:1px solid rgba(255,255,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.75);
+  will-change:transform}
+#dust{position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:3;pointer-events:none}
+#scenes{position:absolute;inset:0;z-index:4}
+.scene{position:absolute;inset:0;opacity:0;visibility:hidden;pointer-events:none}
+.scene.on{pointer-events:auto}
+.cam{position:absolute;inset:0;will-change:transform}
+#fx{position:absolute;inset:0;z-index:5;pointer-events:none}
+.grid{position:absolute;inset:0;opacity:.5;background-image:
+  linear-gradient(rgba(42,29,20,.05) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(42,29,20,.05) 1px,transparent 1px);background-size:120px 120px}
+.vig{position:absolute;inset:0;background:radial-gradient(122% 82% at 50% 42%,transparent 42%,rgba(96,62,36,.20) 100%)}
+.grain{position:absolute;inset:-20px;opacity:.05;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>")}
+#ui{position:absolute;inset:0;z-index:6;pointer-events:none}
+/* ============================================================
+   2) UI
+   ============================================================ */
+#bars{position:absolute;left:72px;right:72px;top:40px;display:flex;gap:12px}
+.bar{flex:1;height:6px;border-radius:99px;background:rgba(42,29,20,.12);overflow:hidden}
+.bar i{display:block;height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accentL));
+  transform:scaleX(0);transform-origin:left center}
+#soundBtn{position:absolute;right:72px;bottom:330px;width:104px;height:104px;border-radius:50%;
+  border:1px solid var(--line);background:rgba(255,255,255,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  display:grid;place-items:center;cursor:pointer;color:var(--ink);pointer-events:auto;
+  box-shadow:0 18px 40px -20px rgba(74,43,23,.45)}
+#soundBtn svg{width:44px;height:44px;display:block}
+#soundBtn .ic-off{display:none}
+#soundBtn[aria-pressed="false"] .ic-on{display:none}
+#soundBtn[aria-pressed="false"] .ic-off{display:block}
+/* ============================================================
+   3) UMUMIY TIPOGRAFIKA
+   ============================================================ */
+.kicker{font-family:var(--fontB);font-weight:600;letter-spacing:.34em;text-transform:uppercase;
+  font-size:40px;color:var(--ink);text-align:center}
+.kicker.sub{font-size:32px;letter-spacing:.42em;color:var(--inkSoft)}
+.wordmark{font-family:var(--fontH);font-weight:800;letter-spacing:-.03em;font-size:104px;color:var(--ink);text-align:center;
+  overflow:hidden;padding-bottom:.16em;margin-bottom:-.16em}
+.revsub{font-size:38px;font-weight:500;color:var(--inkSoft);text-align:center;letter-spacing:-.01em}
+h1.hero{font-family:var(--fontH);font-weight:800;letter-spacing:-.035em;line-height:1.02;font-size:108px;color:var(--ink);text-wrap:balance}
+h2.stmt{font-family:var(--fontH);font-weight:700;letter-spacing:-.03em;line-height:1.14;font-size:80px;color:var(--ink)}
+.w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.16em;margin-bottom:-.16em;margin-right:.24em}
+.wi{display:inline-block;will-change:transform,filter}
+.w.acc .wi{color:var(--accent)}
+@supports (-webkit-background-clip:text){
+  .w.acc .wi{background:linear-gradient(96deg,var(--accent),var(--accentL));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+}
+.w .ul{position:absolute;left:0;bottom:.06em;height:8px;width:88%;border-radius:99px;
+  background:linear-gradient(90deg,var(--accent),var(--accentL));transform:scaleX(0);transform-origin:left center}
+.w.acc{position:relative}
+.pill{display:inline-flex;align-items:center;gap:14px;font-family:var(--fontB);font-weight:600;
+  font-size:32px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);
+  background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:99px;padding:16px 34px;
+  box-shadow:0 18px 40px -26px rgba(74,43,23,.5)}
+.chiprow{position:absolute;left:72px;right:72px;display:flex;gap:18px;flex-wrap:wrap}
+.chip{font-size:34px;font-weight:500;color:var(--ink);background:rgba(255,255,255,.72);
+  border:1px solid var(--line);border-radius:99px;padding:18px 32px;
+  box-shadow:0 16px 34px -24px rgba(74,43,23,.45);will-change:transform,opacity}
+/* mark */
+.markwrap{will-change:transform,opacity}
+.markwrap svg{width:100%;height:100%;display:block}
+/* panel / demo */
+.panel{position:absolute;left:96px;top:496px;width:888px;height:772px;border-radius:28px;
+  background:var(--glass);border:1px solid var(--line);
+  box-shadow:0 30px 70px -34px rgba(122,69,32,.45), inset 0 1px 0 rgba(255,255,255,.85);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;gap:36px;padding:48px}
+.panel .left{width:288px;flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.brewcup{position:relative;width:236px;height:236px;border-radius:50%;overflow:hidden;
+  border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+.brewfill{position:absolute;left:0;right:0;bottom:0;height:0;
+  background:linear-gradient(180deg,#6B3E20,#3E2110)}
+.brewfill::after{content:"";position:absolute;left:0;right:0;top:-10px;height:20px;border-radius:50%;
+  background:#7A4A26}
+.panel .right{flex:1;display:flex;flex-direction:column;justify-content:center;gap:26px}
+.ptitle{font-family:var(--fontH);font-weight:700;font-size:46px;letter-spacing:-.02em;color:var(--ink)}
+.row .rt{display:flex;justify-content:space-between;align-items:baseline;font-size:32px;font-weight:500;color:var(--ink);margin-bottom:12px}
+.row .rs{font-size:28px;color:var(--inkSoft)}
+.track{height:10px;border-radius:99px;background:rgba(42,29,20,.10);overflow:hidden}
+.track i{display:block;height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent2),var(--accent));
+  transform:scaleX(0);transform-origin:left center}
+.term{font-family:var(--fontB);font-weight:500;font-size:32px;color:var(--ink);background:rgba(255,255,255,.6);
+  border:1px solid var(--line);border-radius:16px;padding:20px 24px;display:flex;align-items:center}
+.caret{display:inline-block;width:4px;height:34px;background:var(--accent);margin-left:8px;border-radius:2px}
+.demoNote{position:absolute;left:0;right:0;top:1320px;text-align:center;font-size:30px;color:var(--inkSoft)}
+/* features */
+.grid6{position:absolute;left:80px;top:420px;width:920px;display:grid;grid-template-columns:repeat(2,440px);
+  grid-auto-rows:300px;gap:40px}
+.card{position:relative;border-radius:28px;background:var(--glass);border:1px solid var(--line);padding:32px;
+  box-shadow:0 26px 60px -30px rgba(122,69,32,.42), inset 0 1px 0 rgba(255,255,255,.85);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;flex-direction:column;gap:18px;
+  will-change:transform,opacity}
+.num{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;
+  font-family:var(--fontH);font-weight:700;font-size:26px;color:#fff;
+  background:linear-gradient(140deg,var(--accentL),var(--accent2));box-shadow:0 14px 26px -14px rgba(122,69,32,.8)}
+.card h3{position:relative;display:inline-block;font-family:var(--fontH);font-weight:700;font-size:44px;
+  letter-spacing:-.02em;color:var(--ink);padding-bottom:14px}
+.card h3 .ul{position:absolute;left:0;bottom:0;height:6px;width:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--accent),var(--accentL));transform:scaleX(0);transform-origin:left center}
+.card p{font-size:30px;font-weight:500;line-height:1.28;color:var(--inkSoft);margin-top:-2px}
+/* proof */
+.stmtLabel{position:absolute;left:0;right:0;top:620px;text-align:center;font-size:32px;font-weight:600;
+  letter-spacing:.3em;text-transform:uppercase;color:var(--inkSoft)}
+.stmtBox{position:absolute;left:80px;right:80px;top:740px;text-align:center;text-wrap:balance}
+.stmtLine{display:block}
+/* offer */
+.priceWrap{position:absolute;left:0;right:0;top:846px;text-align:center;will-change:transform,opacity}
+.price{font-family:var(--fontH);font-weight:800;letter-spacing:-.045em;line-height:.94;font-size:220px;color:var(--ink)}
+.price .cur{font-size:70px;letter-spacing:-.01em;margin-left:20px;color:var(--inkSoft);font-weight:700}
+.priceNote{position:absolute;left:0;right:0;top:1120px;text-align:center;font-size:40px;font-weight:500;color:var(--inkSoft)}
+.offerBadge{position:absolute;left:0;right:0;top:1230px;text-align:center}
+.offerBadge span{display:inline-block;font-size:32px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);border:1px solid rgba(168,90,40,.34);border-radius:99px;padding:14px 30px;background:rgba(255,255,255,.6)}
+.bullets{position:absolute;left:0;right:0;top:1360px;display:flex;justify-content:center;gap:20px;flex-wrap:wrap;padding:0 72px}
+.bullet{font-size:30px;font-weight:500;color:var(--ink);background:rgba(255,255,255,.72);border:1px solid var(--line);
+  border-radius:99px;padding:14px 26px;will-change:transform,opacity}
+/* cta */
+.ctaLock{position:absolute;left:0;right:0;top:520px;display:flex;flex-direction:column;align-items:center;gap:26px}
+.ctaLock .markwrap{width:240px;height:240px}
+.ctaPromise{position:absolute;left:80px;right:80px;top:960px;text-align:center;font-size:44px;font-weight:500;
+  line-height:1.2;color:var(--ink)}
+.btn{position:absolute;left:0;right:0;top:1084px;margin:0 auto;width:700px;height:140px;border-radius:99px;
+  display:inline-flex;align-items:center;justify-content:center;gap:20px;text-decoration:none;overflow:hidden;
+  font-family:var(--fontH);font-weight:700;font-size:46px;letter-spacing:-.02em;color:#fff;
+  background:linear-gradient(112deg,var(--accentL),var(--accent) 55%,var(--accent2));
+  box-shadow:0 26px 60px -22px rgba(122,69,32,.75), inset 0 1px 0 rgba(255,255,255,.32);
+  will-change:transform,opacity;pointer-events:auto}
+.btn svg{width:38px;height:38px}
+.sheen{position:absolute;top:0;bottom:0;width:220px;pointer-events:none;opacity:0;
+  background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.42),rgba(255,255,255,0))}
+.glowring{position:absolute;left:190px;right:190px;top:1054px;height:200px;border-radius:99px;pointer-events:none;
+  box-shadow:0 0 0 0 rgba(200,122,52,.45)}
+.ctaPill{position:absolute;left:0;right:0;top:1300px;display:flex;justify-content:center}
+.ctaPill span{font-size:34px;font-weight:600;color:var(--ink);background:rgba(255,255,255,.72);
+  border:1px solid var(--line);border-radius:99px;padding:16px 34px}
+.ctaFoot{position:absolute;left:0;right:0;top:1430px;text-align:center;font-size:30px;color:var(--inkSoft);letter-spacing:.06em}
+/* misc */
+.rule{position:absolute;left:390px;top:1520px;width:300px;height:4px;border-radius:99px;
+  background:linear-gradient(90deg,rgba(168,90,40,0),var(--accent),rgba(168,90,40,0));transform:scaleX(0);will-change:transform,opacity}
+.svgwrap{position:absolute;left:0;right:0;pointer-events:none}
+.hud{position:absolute;inset:0;overflow:visible}
+.hudring{fill:none;stroke:rgba(168,90,40,.34);stroke-width:2}
+.hudring.thin{stroke:rgba(42,29,20,.14);stroke-width:1.5}
+.hudtick{stroke:rgba(168,90,40,.5);stroke-width:3;fill:none;stroke-linecap:round}
+.shockc{fill:none;stroke:var(--accent);stroke-width:5;transform-box:fill-box;transform-origin:50% 50%}
+.shockc.second{stroke:rgba(122,69,32,.4);stroke-width:3}
+.spkl{stroke:rgba(200,122,52,.75);stroke-width:5;stroke-linecap:round}
+.markwrap[data-dim]{filter:blur(9px)}
+[data-in],[data-kind]{will-change:transform,opacity}
+.export #ui{display:none}
+.export #scenes{pointer-events:none}
+.export .btn,.export #soundBtn{pointer-events:none}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg"></div>
+  <div id="blobs"><span class="blob" id="blob1"></span><span class="blob" id="blob2"></span><span class="blob" id="blob3"></span></div>
+  <div id="tiles"></div>
+  <canvas id="dust"></canvas>
+
+  <div id="scenes">
+    <!-- 1 SPARK -->
+    <section class="scene" id="sc-spark" data-scene="0">
+      <div class="cam">
+        <div class="svgwrap" style="top:520px;height:700px">
+          <svg class="hud" viewBox="0 0 700 700" aria-hidden="true">
+            <circle class="hudring" data-in=".05" data-dur=".9" data-kind="draw" cx="350" cy="350" r="300"/>
+            <circle class="hudring thin" data-in=".28" data-dur="1" data-kind="draw" cx="350" cy="350" r="230"/>
+            <circle class="hudring thin" data-in=".5" data-dur="1" data-kind="draw" cx="350" cy="350" r="160"/>
+            <path class="hudtick" data-in=".7" data-dur=".8" data-kind="draw" d="M350 14 L350 72 M350 628 L350 686 M14 350 L72 350 M628 350 L686 350"/>
+          </svg>
+          <div class="markwrap" id="markSpark" data-in=".9" data-dur="1" data-kind="mark" data-scale=".6"
+               style="position:absolute;left:250px;top:150px;width:200px;height:200px"></div>
+        </div>
+        <div class="kicker" style="position:absolute;left:0;right:0;top:1270px" data-in=".7" data-dur=".8"
+             data-kind="rise" data-sfx-type="subtext" data-sfx-delay="700">MACKOFE</div>
+        <div class="kicker sub" style="position:absolute;left:0;right:0;top:1352px" data-in="1.05" data-dur=".7"
+             data-kind="rise" data-sfx-type="subtext" data-sfx-delay="1050">QAHVA</div>
+      </div>
+    </section>
+
+    <!-- 2 REVEAL -->
+    <section class="scene" id="sc-reveal" data-scene="1">
+      <div class="cam">
+        <div class="svgwrap" style="top:470px;height:800px">
+          <svg class="hud" viewBox="0 0 800 800" aria-hidden="true">
+            <g id="sparkGroup" style="transform-origin:400px 400px">
+              <circle class="shockc" data-in="0" data-dur="1.15" data-kind="burst" cx="400" cy="400" r="330"/>
+              <circle class="shockc second" data-in=".14" data-dur="1.3" data-kind="burst" cx="400" cy="400" r="240"/>
+            </g>
+            <g id="sparkLines"></g>
+          </svg>
+          <div class="markwrap" id="markReveal" data-in=".1" data-dur=".9" data-kind="mark"
+               style="position:absolute;left:220px;top:220px;width:360px;height:360px"></div>
+        </div>
+        <div class="wordmark" style="position:absolute;left:0;right:0;top:1310px" data-in=".45" data-dur=".7"
+             data-kind="word" data-sfx-type="headline" data-sfx-delay="450"><span class="wi">MACKOFE</span></div>
+        <div class="revsub" style="position:absolute;left:0;right:0;top:1444px" data-in=".8" data-dur=".6"
+             data-kind="rise" data-sfx-type="subtext" data-sfx-delay="800">Kundagi birinchi ritm</div>
+        <div class="rule" data-in="1" data-dur=".8" data-kind="wrule"></div>
+      </div>
+    </section>
+
+    <!-- 3 HOOK -->
+    <section class="scene" id="sc-hook" data-scene="2">
+      <div class="cam">
+        <div class="pill" style="position:absolute;left:72px;top:452px" data-in=".15" data-dur=".6"
+             data-kind="pop" data-sfx-type="badge" data-sfx-delay="150">Qahva</div>
+        <h1 class="hero" id="heroLine" style="position:absolute;left:72px;right:72px;top:520px"></h1>
+        <div class="markwrap" id="markHook" data-in=".3" data-dur="1" data-kind="mark" data-scale=".88" data-float="1"
+             style="position:absolute;left:640px;top:930px;width:330px;height:330px"></div>
+        <div class="chiprow" id="chipRow" style="top:1440px"></div>
+      </div>
+    </section>
+
+    <!-- 4 DEMO -->
+    <section class="scene" id="sc-demo" data-scene="3">
+      <div class="cam">
+        <div class="panel" data-in=".15" data-dur=".8" data-kind="rise">
+          <div class="left">
+            <div class="brewcup">
+              <div class="brewfill" id="brewFill" data-in=".4" data-dur="1.9" data-kind="brew" data-val=".84"></div>
+            </div>
+          </div>
+          <div class="right">
+            <div class="ptitle" data-in=".4" data-dur=".6" data-kind="rise" data-sfx-type="subtext" data-sfx-delay="400">Tayyorlash</div>
+            <div class="row" data-in=".7" data-dur=".55" data-kind="rise" data-sfx-type="feature" data-sfx-delay="700">
+              <div class="rt"><span>Qovurilgan</span><span class="rs">boshqich</span></div>
+              <div class="track"><i data-in=".82" data-dur=".9" data-kind="fill" data-val="1"></i></div>
+            </div>
+            <div class="row" data-in=".95" data-dur=".55" data-kind="rise" data-sfx-type="feature" data-sfx-delay="950">
+              <div class="rt"><span>Maydalangan</span><span class="rs">d don</span></div>
+              <div class="track"><i data-in="1.07" data-dur=".9" data-kind="fill" data-val=".62"></i></div>
+            </div>
+            <div class="row" data-in="1.2" data-dur=".55" data-kind="rise" data-sfx-type="feature" data-sfx-delay="1200">
+              <div class="rt"><span>Damlanmoqda</span><span class="rs">piyol</span></div>
+              <div class="track"><i data-in="1.32" data-dur=".9" data-kind="fill" data-val=".34"></i></div>
+            </div>
+            <div class="term"><span class="typed" id="typed" data-in="1.6" data-dur="1.2" data-kind="type"
+              data-text="qahva tayyor — istalgan paytdan boshlash"
+              data-sfx-type="type"></span><i class="caret" id="caret"></i></div>
+          </div>
+        </div>
+        <div class="demoNote" data-in="1.9" data-dur=".45" data-kind="rise" data-sfx-type="subtext" data-sfx-delay="1900">namoyish</div>
+      </div>
+    </section>
+
+    <!-- 5 FEATURES -->
+    <section class="scene" id="sc-features" data-scene="4">
+      <div class="cam">
+        <div class="kicker sub" style="position:absolute;left:0;right:0;top:300px" data-in=".15" data-dur=".6"
+             data-kind="rise" data-sfx-type="subtext" data-sfx-delay="150">Nima beradi</div>
+        <div class="grid6" id="cardGrid"></div>
+      </div>
+    </section>
+
+    <!-- 6 PROOF -->
+    <section class="scene" id="sc-proof" data-scene="5">
+      <div class="cam">
+        <div class="markwrap" id="markProof" data-in=".1" data-dur="1.2" data-kind="mark" data-scale="1.5" data-dim="1"
+             style="position:absolute;left:390px;top:790px;width:300px;height:300px"></div>
+        <div class="stmtLabel" data-in=".2" data-dur=".6" data-kind="rise" data-sfx-type="subtext" data-sfx-delay="200">Umumiy foyda</div>
+        <div class="stmtBox" id="stmtBox"></div>
+      </div>
+    </section>
+
+    <!-- 7 OFFER -->
+    <section class="scene" id="sc-offer" data-scene="6">
+      <div class="cam">
+        <div class="markwrap" id="markOffer" data-in=".1" data-dur=".8" data-kind="mark" data-scale=".62"
+             style="position:absolute;left:440px;top:440px;width:200px;height:200px"></div>
+        <div class="priceWrap" id="priceWrap" data-in=".25" data-dur=".8" data-kind="rise" data-sfx-type="price" data-sfx-delay="250">
+          <span class="price" id="priceMain">45 000<span class="cur">so‘m</span></span>
+        </div>
+        <div class="priceNote" data-in=".7" data-dur=".5" data-kind="rise" data-sfx-type="subtext" data-sfx-delay="700" id="priceNote">250 g qop</div>
+        <div class="offerBadge" data-in=".85" data-dur=".45" data-kind="pop"><span id="offerBadge">Kundalik ritm</span></div>
+        <div class="bullets" id="bulletRow"></div>
+      </div>
+    </section>
+
+    <!-- 8 CTA -->
+    <section class="scene" id="sc-cta" data-scene="7">
+      <div class="cam">
+        <div class="ctaLock">
+          <div class="markwrap" id="markCta" data-in=".3" data-dur=".8" data-kind="mark" data-scale=".72"></div>
+          <div class="wordmark" style="font-size:88px" data-in=".6" data-dur=".6" data-kind="word"
+               data-sfx-type="headline" data-sfx-delay="600"><span class="wi">MACKOFE</span></div>
+        </div>
+        <div class="ctaPromise" data-in="1" data-dur=".6" data-kind="rise" data-sfx-type="subtext" data-sfx-delay="1000" id="ctaPromise">
+          Bugun damlang — ertaga o‘z vazifangizga qaytiring.</div>
+        <div class="glowring" id="ctaGlow"></div>
+        <a class="btn" id="ctaBtn" href="#" target="_blank" rel="noopener noreferrer"
+           data-in="1.5" data-dur=".7" data-kind="pop" data-sfx-type="cta" data-sfx-delay="1500">
+          <span id="ctaText">Buyurtma berish</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          <i class="sheen" id="sheen"></i>
+        </a>
+        <div class="ctaPill" data-in="2.1" data-dur=".5" data-kind="pop" data-sfx-type="badge" data-sfx-delay="2100">
+          <span id="ctaPill">45 000 so‘m · 250 g</span>
+        </div>
+        <div class="ctaFoot" data-in="2.4" data-dur=".5" data-kind="rise" data-sfx-type="subtext" data-sfx-delay="2400" id="ctaFoot">MACKOFE · qahva</div>
+      </div>
+    </section>
+  </div>
+
+  <div id="fx" aria-hidden="true">
+    <div class="grid"></div><div class="vig"></div><div class="grain"></div>
+  </div>
+
+  <div id="ui">
+    <div id="bars" aria-hidden="true"></div>
+    <button id="soundBtn" type="button" aria-pressed="true" aria-label="Ovozni o‘chirish">
+      <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+      <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m16 9 5 6M21 9l-5 6"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   1) KONFIGURATSIYA — FAQAT SHU YERNI TAHRIRLANG
+   ================================================================ */
+const CONFIG = {
+  brand: 'MACKOFE',                 // brend nomi
+  productName: 'MACKOFE qahvasi',   // to‘liq mahsulot nomi
+  category: 'Qahva',                // kategoriya
+  kicker2: 'QAHVA',                 // 1-sahnadagi kichik yozuv
+  revSub: 'Kundagi birinchi ritm',  // 2-sahna izohi
+  // 3-sahna sarlavhasi: [matn, urg‘ulami(1) yoki oddiy(0)]
+  heroLine: [['Energiya',0],['va',0],['kayfiyat',0],['—',0],['bir piyolda',1]],
+  // umumiy foydalar (tekshirilmagan maxsus xususiyat emas)
+  chips: ['Kayfiyat','Energiya','Diqqat','Nafas'],
+  features: [
+    {n:'01', title:'Energiya',  caption:'Qisqa muddatli tetiklantirish'},
+    {n:'02', title:'Kayfiyat',  caption:'Kayfiyatni yaxshilaydi'},
+    {n:'03', title:'Diqqat',    caption:'Aqldan boshlashga yordam'},
+    {n:'04', title:'Nafas',     caption:'Nafas olishni yengillashtiradi'},
+    {n:'05', title:'Ta’m',      caption:'Yumshoq, muvozanatli ta’m'},
+    {n:'06', title:'Ritm',      caption:'Kundalik bir marhabadagi odat'}
+  ],
+  experienceNote: 'Umumiy foyda',  // 6-sahna yorlig‘i
+  experienceLine: [['Kunning eng yaxshi',0],['qismi — birinchi piyol.',1]],
+  // NAMUNAVIY NARX — haqiqiy narxni shu yerga yozing
+  price: '45 000',
+  currency: 'so‘m',
+  priceNote: '250 g qop',
+  offerBadge: 'Kundalik ritm',
+  offerBullets: ['250 g qop','Quruq, yopiq saqlash','Uyda qo‘lda tayyorlanadi'],
+  ctaPromise: 'Bugun damlang — ertaga o‘z vazifangizga qaytiring.',
+  ctaText: 'Buyurtma berish',
+  ctaUrl: null,                     // masalan 'https://t.me/...' — null bo‘lsa «#»
+  supportLine: null,                // Telegram/handle yoki URL (berilgan bo‘lsa)
+  footer: 'MACKOFE · qahva',
+  image: null,                      // 'product.png' yoki data: URI (berilmasa CSS mark)
+  logoMode: true,
+  palette: {bg:'#FBF6F0', bg2:'#F1E4D6', ink:'#2A1D14', inkSoft:'#6E5947',
+            accent:'#A85A28', accent2:'#7A4520', glow:'rgba(168,90,40,.22)'},
+  theme: 'light',                   // 'light' | 'tinted'
+  bpm: 120,
+  // sahnalar davomiyligi — BEAT soni (60/bpm = 0.5 s)
+  scenes: [
+    {id:'spark',beats:4},{id:'reveal',beats:4},{id:'hook',beats:6},{id:'demo',beats:6},
+    {id:'features',beats:8},{id:'proof',beats:4},{id:'offer',beats:4},{id:'cta',beats:12}
+  ],
+  seed: 20260928,
+  sfxEnabled: true
+};
+
+/* ================================================================
+   2) DOIMIY KADRLAR VA YORDAMCHILAR
+   ================================================================ */
+const FPS = 60, BPM = CONFIG.bpm, BEAT = 60 / BPM;
+const SCENES = (() => {
+  let t = 0;
+  return CONFIG.scenes.map((s, i) => {
+    const sc = { id: s.id, i, start: t, dur: s.beats * BEAT };
+    t += sc.dur; return sc;
+  });
+})();
+const DURATION = SCENES[SCENES.length - 1].start + SCENES[SCENES.length - 1].dur;
+const N_SCENES = SCENES.length;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const EXPORT = /(\?|&)export=1/.test(location.search);
+const SELFTEST = /(\?|&)selftest=1/.test(location.search);
+const $ = s => document.querySelector(s);
+const $$ = s => Array.prototype.slice.call(document.querySelectorAll(s));
+const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+const seg = (t, a, b) => clamp01((t - a) / (b - a));
+const lerp = (a, b, p) => a + (b - a) * p;
+const easeOutExpo = p => p >= 1 ? 1 : 1 - Math.pow(2, -10 * p);
+const easeOutCubic = p => 1 - Math.pow(1 - p, 3);
+const easeInOutCubic = p => p < .5 ? 4*p*p*p : 1 - Math.pow(-2*p+2, 3)/2;
+const easeOutBack = (p, o) => { const c1 = o || 1.4, c3 = c1 + 1; return 1 + c3*Math.pow(p-1,3) + c1*Math.pow(p-1,2); };
+function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const rnd = mulberry32(CONFIG.seed);
+const q = n => Math.round(n * 100) / 100;
+
+/* palitra va matn — DOM'ga yozish */
+(function applyPalette(){
+  const P = CONFIG.palette, R = document.documentElement.style;
+  R.setProperty('--bg', P.bg); R.setProperty('--bg2', P.bg2);
+  R.setProperty('--ink', P.ink); R.setProperty('--inkSoft', P.inkSoft);
+  R.setProperty('--accent', P.accent); R.setProperty('--accent2', P.accent2); R.setProperty('--glow', P.glow);
+  R.setProperty('--line', 'rgba(' + hex2rgb(P.ink) + ',.10)');
+  const h = parseInt(P.accent.slice(1), 16);
+  const l = shade(h, 22);
+  R.setProperty('--accentL', 'rgb(' + l[0] + ',' + l[1] + ',' + l[2] + ')');
+  document.body.style.background = P.bg2;
+})();
+function hex2rgb(h){ const v = parseInt(h.slice(1), 16); return [v >> 16 & 255, v >> 8 & 255, v & 255].join(','); }
+function shade(v, d){ const r = clampByte((v >> 16 & 255) + d), g = clampByte((v >> 8 & 255) + d * .8), b = clampByte((v & 255) + d * .6); return [r, g, b]; }
+function clampByte(v){ return Math.max(0, Math.min(255, Math.round(v))); }
+
+/* har sahnaning fon gradyanti (o'zgarib turishi uchun) */
+const BGS = [
+  'radial-gradient(120% 80% at 50% 18%, #FFFDFA 0%, #FBF6F0 46%, #F3E7DA 100%), linear-gradient(180deg,#FCF7F1 0%,#F4E9DC 100%)',
+  'radial-gradient(90% 60% at 50% 44%, #FFF6E9 0%, #F8EDE1 52%, #EFDFCE 100%), linear-gradient(180deg,#F9F1E7 0%,#EEDDCB 100%)',
+  'radial-gradient(110% 70% at 22% 24%, #FFFBF5 0%, #FAF2E8 50%, #F0E1D2 100%), linear-gradient(180deg,#FBF4EC 0%,#EFE0D1 100%)',
+  'radial-gradient(100% 66% at 70% 34%, #FFF8EE 0%, #F9EFE3 54%, #EFE1D0 100%), linear-gradient(180deg,#FAF3EA 0%,#EDDECE 100%)',
+  'radial-gradient(120% 70% at 50% 26%, #FFFDF9 0%, #FAF4EC 52%, #F1E3D4 100%), linear-gradient(180deg,#FBF5EE 0%,#EFE0D1 100%)',
+  'radial-gradient(84% 58% at 50% 50%, #FFF7EC 0%, #F7EADC 50%, #E9D6C2 100%), linear-gradient(180deg,#F6EADC 0%,#E7D3BE 100%)',
+  'radial-gradient(100% 62% at 50% 40%, #FFF9F1 0%, #F8EDDF 50%, #EEDDC8 100%), linear-gradient(180deg,#F9F0E5 0%,#ECDAC4 100%)',
+  'radial-gradient(116% 74% at 50% 30%, #FFFCF6 0%, #FAF3E9 52%, #F0E1D0 100%), linear-gradient(180deg,#FAF4EB 0%,#EDE0D1 100%)'
+];
+
+/* ================================================================
+   3) MAHSULOT BELGISI (CSS/SVG mark — rasm berilmasa)
+   ================================================================ */
+const MARK_SVG =
+'<svg viewBox="0 0 320 320" aria-hidden="true">' +
+ '<defs><linearGradient id="gCup" x1="0" y1="0" x2="1" y2="1">' +
+ '<stop offset="0" data-stop="a"/><stop offset="1" data-stop="b"/></linearGradient></defs>' +
+ '<ellipse cx="160" cy="286" rx="104" ry="13" data-fill="shadow"/>' +
+ '<path d="M58 150 H262 L250 216 A80 80 0 0 1 70 216 Z" fill="url(#gCup)"/>' +
+ '<path d="M262 168 C 310 168, 310 222, 254 222" fill="none" stroke="url(#gCup)" stroke-width="17" stroke-linecap="round"/>' +
+ '<ellipse cx="160" cy="150" rx="102" ry="19" data-fill="rim"/>' +
+ '<ellipse cx="160" cy="151" rx="86" ry="13" data-fill="coffee"/>' +
+ '<path d="M118 92 C 106 72, 130 62, 118 40" fill="none" stroke-width="7" stroke-linecap="round" data-stroke="ink" opacity=".32"/>' +
+ '<path d="M160 84 C 148 64, 172 54, 160 32" fill="none" stroke-width="7" stroke-linecap="round" data-stroke="ink" opacity=".32"/>' +
+ '<path d="M202 92 C 190 72, 214 62, 202 40" fill="none" stroke-width="7" stroke-linecap="round" data-stroke="ink" opacity=".32"/>' +
+ '</svg>';
+
+(function paintMark(){
+  const P = CONFIG.palette, h = parseInt(P.accent.slice(1), 16);
+  const map = { a: 'rgb(' + shade(h, 26).join(',') + ')', b: P.accent2,
+    shadow: 'rgba(' + hex2rgb(P.ink) + ',.10)', rim: shade(h, 6).join(','), coffee: '#4A2B17', ink: P.ink };
+  $$('[data-fill],[data-stroke],[data-stop]').forEach(n => {
+    const key = n.dataset.fill || n.dataset.stroke || n.dataset.stop;
+    const v = map[key]; if (!v) return;
+    if (n.tagName === 'stop') n.setAttribute('stop-color', v);
+    else n.setAttribute(n.dataset.stroke ? 'stroke' : 'fill', v);
+  });
+  ['markSpark','markReveal','markHook','markProof','markOffer','markCta'].forEach(id => {
+    const n = document.getElementById(id); if (n) n.innerHTML = MARK_SVG;
+  });
+})();
+
+/* ================================================================
+   4) CONFIGDAN KELTIRILGAN ELEMENTLAR
+   ================================================================ */
+(function buildContent(){
+  /* 3-sahna sarlavhasi */
+  const hero = $('#heroLine');
+  CONFIG.heroLine.forEach((w, i) => {
+    const acc = !!w[1];
+    const s = document.createElement('span');
+    s.className = 'w' + (acc ? ' acc' : '');
+    s.dataset.in = (0.35 + i * 0.09).toFixed(2);
+    s.dataset.dur = '0.7'; s.dataset.kind = 'word';
+    if (i === 0) { s.dataset.sfxType = 'headline'; s.dataset.sfxDelay = '350'; }
+    const inner = document.createElement('span'); inner.className = 'wi'; inner.textContent = w[0];
+    s.appendChild(inner);
+    if (acc) { const u = document.createElement('i'); u.className = 'ul';
+      u.dataset.in = '1.15'; u.dataset.dur = '0.7'; u.dataset.kind = 'fill'; u.dataset.val = '.88'; s.appendChild(u); }
+    hero.appendChild(s);
+  });
+  /* chiplar */
+  const row = $('#chipRow');
+  CONFIG.chips.slice(0, 5).forEach((c, i) => {
+    const d = (1.35 + i * 0.12).toFixed(2);
+    const n = document.createElement('span'); n.className = 'chip';
+    n.dataset.in = d; n.dataset.dur = '.5'; n.dataset.kind = 'pop';
+    n.dataset.sfxType = 'badge'; n.dataset.sfxDelay = String(Math.round(d * 1000));
+    n.textContent = c; row.appendChild(n);
+  });
+  /* 5-sahna kartalari */
+  const grid = $('#cardGrid');
+  CONFIG.features.slice(0, 6).forEach((f, i) => {
+    const d = 0.45 + i * 0.13, ds = d.toFixed(2);
+    const a = document.createElement('article'); a.className = 'card';
+    a.dataset.in = ds; a.dataset.dur = '.7'; a.dataset.kind = 'card';
+    a.dataset.sfxType = 'feature'; a.dataset.sfxDelay = String(Math.round(d * 1000));
+    const num = document.createElement('div'); num.className = 'num'; num.textContent = f.n;
+    const h3 = document.createElement('h3');
+    const span = document.createElement('span'); span.textContent = f.title;
+    const ul = document.createElement('i'); ul.className = 'ul';
+    ul.dataset.in = (d + .2).toFixed(2); ul.dataset.dur = '.8'; ul.dataset.kind = 'fill'; ul.dataset.val = '1';
+    h3.appendChild(span); h3.appendChild(ul);
+    const p = document.createElement('p'); p.textContent = f.caption;
+    a.appendChild(num); a.appendChild(h3); a.appendChild(p);
+    grid.appendChild(a);
+  });
+  /* 6-sahna bayonoti */
+  const box = $('#stmtBox');
+  CONFIG.experienceLine.forEach((line, i) => {
+    const s = document.createElement('span'); s.className = 'w stmtLine' + (line[1] ? ' acc' : '');
+    s.dataset.in = (0.45 + i * 0.5).toFixed(2); s.dataset.dur = '.7'; s.dataset.kind = 'word';
+    if (i === 0) { s.dataset.sfxType = 'headline'; s.dataset.sfxDelay = '450'; }
+    const inner = document.createElement('span'); inner.className = 'wi'; inner.textContent = line[0];
+    s.appendChild(inner);
+    if (line[1]) { const u = document.createElement('i'); u.className = 'ul';
+      u.dataset.in = (0.45 + i * 0.5 + 0.7).toFixed(2); u.dataset.dur = '.7'; u.dataset.kind = 'fill'; u.dataset.val = '.7'; s.appendChild(u); }
+    box.appendChild(s);
+  });
+  /* 7-sahna: narx, badge, bulletlar */
+  $('#priceMain').innerHTML = CONFIG.price + '<span class="cur">' + CONFIG.currency + '</span>';
+  $('#priceNote').textContent = CONFIG.priceNote;
+  $('#offerBadge').textContent = CONFIG.offerBadge;
+  const brow = $('#bulletRow');
+  CONFIG.offerBullets.slice(0, 3).forEach((b, i) => {
+    const d = (0.9 + i * 0.08).toFixed(2);
+    const n = document.createElement('span'); n.className = 'bullet';
+    n.dataset.in = d; n.dataset.dur = '.35'; n.dataset.kind = 'pop';
+    n.dataset.sfxType = 'subtext'; n.dataset.sfxDelay = String(Math.round(d * 1000));
+    n.textContent = b; brow.appendChild(n);
+  });
+  /* 8-sahna */
+  $('#ctaText').textContent = CONFIG.ctaText;
+  $('#ctaPromise').textContent = CONFIG.ctaPromise;
+  $('#ctaFoot').textContent = CONFIG.footer;
+  $('#ctaPill').textContent = CONFIG.price + ' ' + CONFIG.currency + ' · ' + CONFIG.priceNote;
+  if (CONFIG.supportLine) {
+    const s = document.createElement('span'); s.textContent = CONFIG.supportLine;
+    $('#ctaPill').parentNode.appendChild(s);
+  }
+  const btn = $('#ctaBtn');
+  btn.setAttribute('href', CONFIG.ctaUrl || '#');
+  if (!/^(https?:|mailto:|tel:)/i.test(CONFIG.ctaUrl || '')) btn.removeAttribute('target');
+  /* matnlar */
+  $('#kickerBrand') ; /* placeholder */
+  $$('.kicker').forEach(n => { if (n.textContent.trim() === 'MACKOFE') n.textContent = CONFIG.brand.toUpperCase(); });
+  $$('.wordmark .wi').forEach(n => n.textContent = CONFIG.brand.toUpperCase());
+  $$('.kicker.sub').forEach(n => { n.textContent = (n.dataset.keep || (n.closest('#sc-spark') ? CONFIG.kicker2 : 'Nima beradi')); });
+  $('#markReveal') ; $('#revSub');
+  $$('.revsub').forEach(n => n.textContent = CONFIG.revSub);
+  $$('.stmtLabel').forEach(n => n.textContent = CONFIG.experienceNote);
+  /* eski tuzilma tozalash */
+  void $('#kickerBrand'); void $('#revSub');
+})();
+
+/* ================================================================
+   5) FON QATLAMLARI: shisha plitalar, chang, blob'lar
+   ================================================================ */
+const TILES = [];
+(function buildTiles(){
+  const host = $('#tiles');
+  const spec = [
+    {x: 90,  y: 240, s: 150, d: 0}, {x: 820, y: 300, s: 210, d: 1}, {x: 180, y: 1180, s: 240, d: 2},
+    {x: 760, y: 1320, s: 170, d: 0}, {x: 420, y: 820, s: 110, d: 1}, {x: 620, y: 180, s: 95, d: 0},
+    {x: 120, y: 1640, s: 190, d: 1}, {x: 880, y: 1720, s: 130, d: 2}
+  ];
+  spec.forEach(t => {
+    const n = document.createElement('span'); n.className = 'tile';
+    n.style.width = t.s + 'px'; n.style.height = t.s + 'px';
+    n.style.left = t.x + 'px'; n.style.top = t.y + 'px';
+    if (t.d === 0) n.style.filter = 'blur(8px)';
+    if (t.d === 2) n.style.opacity = '.55';
+    host.appendChild(n);
+    TILES.push({ el: n, x: t.x, y: t.y, s: t.s, d: t.d, ph: rnd() * 6.28, sp: .12 + rnd() * .22, amt: 12 + rnd() * 26 });
+  });
+})();
+const BLOBS = [
+  { el: $('#blob1'), x: -10, y: -6, w: 780, col: 'rgba(168,90,40,.26)', sp: .16, ph: 0 },
+  { el: $('#blob2'), x: 52,  y: 18,  w: 720, col: 'rgba(200,122,52,.20)', sp: .21, ph: 1.7 },
+  { el: $('#blob3'), x: 12,  y: 58,  w: 820, col: 'rgba(122,69,32,.18)', sp: .13, ph: 3.1 }
+];
+BLOBS.forEach(b => { b.el.style.width = b.w + 'px'; b.el.style.height = b.w + 'px';
+  b.el.style.left = b.x + '%'; b.el.style.top = b.y + '%'; b.el.style.background = 'radial-gradient(circle at 45% 45%,' + b.col + ',' + b.col.replace(/[\d.]+\)$/, '0)') + ' 70%)'; });
+
+const DUST = [];
+for (let i = 0; i < 78; i++) DUST.push({ x: rnd() * 1080, y: rnd() * 1920, r: 1.1 + rnd() * 2.6,
+  o: .18 + rnd() * .42, f: .6 + rnd() * 1.8, ph: rnd() * 6.28, sp: 5 + rnd() * 12 });
+const dustCv = $('#dust'), dustCx = dustCv.getContext('2d');
+const DPR = EXPORT ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+dustCv.width = Math.round(1080 * DPR); dustCv.height = Math.round(1920 * DPR);
+dustCx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+/* ================================================================
+   6) ANIMATSIYA RO'YXATI (bir marta, renderAt ichida qayta ishlatiladi)
+   ================================================================ */
+const SCENE_EL = SCENES.map(s => document.getElementById('sc-' + s.id));
+const CAM_EL = SCENE_EL.map(n => n.querySelector('.cam'));
+/* 2-sahna radial chiziqlar (ANIMS dan OLDIN quriladi) */
+(function buildSparks(){
+  const g = $('#sparkLines');
+  for (let i = 0; i < 12; i++) {
+    const a = i * 30, r1 = 150, r2 = 232;
+    const x1 = 400 + Math.cos(a*Math.PI/180) * r1, y1 = 400 + Math.sin(a*Math.PI/180) * r1;
+    const x2 = 400 + Math.cos(a*Math.PI/180) * r2, y2 = 400 + Math.sin(a*Math.PI/180) * r2;
+    const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    l.setAttribute('x1', q(x1)); l.setAttribute('y1', q(y1));
+    l.setAttribute('x2', q(x2)); l.setAttribute('y2', q(y2));
+    l.setAttribute('class', 'spkl');
+    l.dataset.in = (0.02 + i * 0.018).toFixed(3); l.dataset.dur = '.9'; l.dataset.kind = 'spkl';
+    g.appendChild(l);
+  }
+})();
+const ANIMS = SCENE_EL.map(n => Array.prototype.map.call(n.querySelectorAll('[data-kind]'), el => {
+  const kind = el.dataset.kind;
+  const rec = { el, kind, in: parseFloat(el.dataset.in || 0), dur: parseFloat(el.dataset.dur || .6),
+                val: parseFloat(el.dataset.val || 1), phase: 0, L: 0, inner: el.querySelector('.wi') };
+  if (kind === 'word' || kind === 'type') rec.inner = el.querySelector('.wi') || el;
+  if (kind === 'draw') { try { rec.L = el.getTotalLength() || 0; } catch (e) { rec.L = 0; } }
+  if (kind === 'mark') rec.ph = rnd() * 6.28;
+  if (kind === 'type') rec.text = el.dataset.text || '';
+  return rec;
+}));
+/* progress baloklari */
+const BARS = [];
+(function buildBars(){
+  const host = $('#bars');
+  for (let i = 0; i < N_SCENES; i++) {
+    const b = document.createElement('div'); b.className = 'bar';
+    const f = document.createElement('i'); b.appendChild(f); host.appendChild(b);
+    BARS.push(f);
+  }
+})();
+
+/* ================================================================
+   7) RENDER — faqat t dan bog'liq, idempotent
+   ================================================================ */
+let lastT = -1, curIdx = -1;
+function applyOne(a, lt, t) {
+  const p = seg(lt, a.in, a.in + a.dur);
+  const e = a.el;
+  switch (a.kind) {
+    case 'rise': {
+      const k = easeOutCubic(p);
+      e.style.opacity = String(clamp01(p * 1.8));
+      e.style.transform = REDUCED ? 'none' : 'translate3d(0,' + q((1 - k) * 30) + 'px,0)';
+      break;
+    }
+    case 'word': {
+      const k = easeOutExpo(p), a2 = a.inner;
+      e.style.opacity = String(clamp01(p * 2.2));
+      a2.style.transform = REDUCED ? 'none' : 'translate3d(0,' + q((1 - k) * 106) + '%,0)';
+      const bp = Math.min(1, p / 0.7);
+      a2.style.filter = (REDUCED || bp >= 1) ? 'none' : 'blur(' + q((1 - bp) * 11) + 'px)';
+      break;
+    }
+    case 'pop': {
+      const k = easeOutBack(p, 1.9);
+      e.style.opacity = String(clamp01(p * 2));
+      e.style.transform = REDUCED ? 'none' : 'scale(' + q(0.55 + 0.45 * k) + ')';
+      break;
+    }
+    case 'card': {
+      const k = easeOutBack(p, 1.4), o = easeOutCubic(p);
+      e.style.opacity = String(clamp01(p * 1.7));
+      e.style.transform = REDUCED ? 'none' : 'translate3d(0,' + q((1 - o) * 46) + 'px,0) scale(' + q(0.93 + 0.07 * k) + ')';
+      break;
+    }
+    case 'draw': {
+      const L = a.L || 0;
+      e.style.strokeDasharray = L ? L + ' ' + L : 'none';
+      e.style.strokeDashoffset = String(q(L * (1 - easeOutCubic(p))));
+      e.style.opacity = String(clamp01(p * 2));
+      break;
+    }
+    case 'wrule': {
+      e.style.opacity = String(clamp01(p * 2));
+      e.style.transform = 'scaleX(' + q(easeOutCubic(p)) + ')';
+      break;
+    }
+    case 'fill': {
+      e.style.opacity = String(clamp01(p * 2));
+      e.style.transform = 'scaleX(' + q(a.val * easeOutCubic(p)) + ')';
+      break;
+    }
+    case 'brew': {
+      e.style.height = q(a.val * 100 * easeInOutCubic(p)) + '%';
+      break;
+    }
+    case 'type': {
+      const n = Math.round(a.text.length * easeOutCubic(p));
+      if (a.inner.textContent !== a.text.slice(0, n)) a.inner.textContent = a.text.slice(0, n);
+      e.style.opacity = '1';
+      break;
+    }
+    case 'spkl': {
+      const k = easeOutExpo(p);
+      e.style.opacity = String(Math.max(0, 1 - p * p));
+      e.style.strokeWidth = String(q(5 * (1 - p * .6)));
+      e.style.transform = 'none';
+      break;
+    }
+    case 'burst': {
+      const k = easeOutCubic(p);
+      const sc = REDUCED ? 1 : 0.34 + 2.1 * k;
+      e.style.transform = 'scale(' + q(sc) + ')';
+      e.style.opacity = String(clamp01(p < .12 ? p / .12 : 1 - (p - .12) / .88));
+      break;
+    }
+    case 'mark': {
+      const k = easeOutBack(p, 1.5), o = easeOutCubic(p);
+      const s = parseFloat(e.dataset.scale || '1');
+      const fl = REDUCED ? 0 : (e.dataset.float ? Math.sin(t * .9 + a.ph) * 14 : Math.sin(t * .7 + a.ph) * 8);
+      e.style.opacity = String(clamp01(o * 1.4) * (e.dataset.dim ? .16 : 1));
+      e.style.transform = REDUCED ? 'none' :
+        'translate3d(0,' + q((1 - k) * 40 + fl) + 'px,0) scale(' + q(s * (0.62 + 0.38 * k)) + ')';
+      break;
+    }
+  }
+}
+function renderAt(time) {
+  const t = ((time % DURATION) + DURATION) % DURATION;
+  let idx = N_SCENES - 1;
+  for (let i = 0; i < N_SCENES; i++) { if (t < SCENES[i].start + SCENES[i].dur) { idx = i; break; } }
+  const sc = SCENES[idx], lt = t - sc.start, cp = clamp01(lt / sc.dur);
+
+  /* faol sahna */
+  if (idx !== curIdx) {
+    curIdx = idx;
+    SCENE_EL.forEach((n, i) => {
+      const on = i === idx;
+      n.style.visibility = on ? 'visible' : 'hidden';
+      n.classList.toggle('on', on);
+      n.setAttribute('aria-hidden', on ? 'false' : 'true');
+    });
+  }
+  /* sahna darajasi: kirish 0.30 s, chiqish 0.22 s */
+  for (let i = 0; i < N_SCENES; i++) {
+    const s = SCENES[i];
+    let op = 0;
+    if (i === idx) {
+      op = Math.min(s.start === 0 ? 1 : seg(lt, 0, .30), 1 - seg(lt, s.dur - .22, s.dur));
+    }
+    SCENE_EL[i].style.opacity = String(clamp01(op));
+    /* kamera har sahna ichida uzluksiz */
+    const cs = 1 + .045 * cp;
+    const cx = REDUCED ? 0 : Math.sin(t * .22 + i) * 10 * cp;
+    const cy = REDUCED ? 0 : Math.cos(t * .18 + i) * 8 * cp;
+    CAM_EL[i].style.transform = 'translate3d(' + q(cx) + 'px,' + q(cy) + 'px,0) scale(' + q(cs) + ')';
+  }
+  /* fon */
+  $('#bg').style.background = BGS[idx];
+
+  /* plitalar + parallax */
+  const acc = anticipation(t);
+  for (let i = 0; i < TILES.length; i++) {
+    const T = TILES[i], sp = T.sp * (1 + acc * .8), amp = REDUCED ? 0 : T.amt * (1 + acc * .5);
+    const x = Math.sin(t * sp + T.ph) * amp, y = Math.cos(t * sp * .8 + T.ph) * amp * 1.2;
+    const rot = REDUCED ? 0 : Math.sin(t * sp * .5 + T.ph) * 3.2;
+    T.el.style.transform = 'translate3d(' + q(x) + 'px,' + q(y) + 'px,0) rotate(' + q(rot) + 'deg)';
+  }
+  $('#tiles').style.transform = 'translate3d(' + q(REDUCED ? 0 : Math.sin(t * .22 + idx) * 3) + 'px,0,0)';
+  for (let i = 0; i < BLOBS.length; i++) {
+    const B = BLOBS[i];
+    const x = REDUCED ? 0 : Math.sin(t * B.sp + B.ph) * 4, y = REDUCED ? 0 : Math.cos(t * B.sp * .8 + B.ph) * 3;
+    B.el.style.transform = 'translate3d(' + q(x + (idx % 2 ? 6 : -6)) + 'px,' + q(y) + 'px,0)';
+  }
+  /* chang */
+  dustCx.clearRect(0, 0, 1080, 1920);
+  if (!REDUCED) {
+    for (let i = 0; i < DUST.length; i++) {
+      const p = DUST[i];
+      const o = p.o * (.55 + .45 * Math.sin(t * p.f + p.ph));
+      if (o <= 0) continue;
+      let yy = (p.y - t * p.sp) % 1920; if (yy < 0) yy += 1920;
+      dustCx.beginPath();
+      dustCx.fillStyle = 'rgba(122,69,32,' + o.toFixed(3) + ')';
+      dustCx.arc(p.x, yy, p.r, 0, 6.2832);
+      dustCx.fill();
+    }
+  }
+  /* animatsiyalar */
+  for (let i = 0; i < N_SCENES; i++) {
+    const list = ANIMS[i];
+    for (let k = 0; k < list.length; k++) {
+      if (i !== idx && SCENES[i].start > t + .001) continue;   /* hali kelmagan */
+      applyOne(list[k], Math.max(0, t - SCENES[i].start), t);
+    }
+  }
+  /* sahnaga xos qo'shimchalar */
+  if (idx === 6) { /* narx pulsi */
+    const el = $('#priceWrap'), s = 1 + (REDUCED ? 0 : .012 * Math.sin(t * 3.1));
+    el.style.transform = 'translate3d(0,0,0) scale(' + q(s) + ')';
+  }
+  if (idx === 7) { /* CTA sheen + glow */
+    const sh = $('#sheen'), gl = $('#ctaGlow');
+    const span = 2.4, start = 19.2;
+    if (t >= start) {
+      const ph = (t - start) % span;
+      const k = ph / .9;
+      sh.style.opacity = k < 1 ? (k < .12 ? k / .12 : 1 - (k - .12) / .88) * .9 : 0;
+      sh.style.transform = 'translateX(' + q(-260 + 700 * clamp01(k)) + 'px) skewX(-18deg)';
+    } else { sh.style.opacity = '0'; }
+    if (!REDUCED) { const gp = ((t - 17.5) % 2) / 2; gl.style.opacity = String(.4 * (1 - gp)); gl.style.transform = 'scale(' + q(.98 + .1 * gp) + ')'; }
+    else { gl.style.opacity = '0'; }
+  }
+  /* kursor (terminal) */
+  if (idx === 3) $('#caret').style.opacity = String(.35 + .65 * (Math.sin(t * 7) > 0 ? 1 : 0));
+  /* progress */
+  for (let i = 0; i < N_SCENES; i++) {
+    const s = SCENES[i];
+    const w = t >= s.start + s.dur ? 1 : (t <= s.start ? 0 : (t - s.start) / s.dur);
+    BARS[i].style.transform = 'scaleX(' + q(w) + ')';
+  }
+  lastT = t;
+  return t;
+}
+function anticipation(t) {
+  let best = 0;
+  for (let i = 1; i < N_SCENES; i++) {
+    const ct = SCENES[i].start, d = ct - t;
+    if (d > 0 && d < .5) best = Math.max(best, 1 - d / .5);
+  }
+  return best;
+}
+
+/* ================================================================
+   8) AUDIO — bitta hodisa ro'yxati, bir xil graf live va offline
+   ================================================================ */
+const PRIO = {impact:100, cta:90, price:80, headline:70, cut:60, feature:50, badge:40, subtext:30, tick:20, type:10,
+  riser:5, pad:1, bass:2, kick:3, hat:4, pluck:2, whoosh:55, sheen:15};
+const dbLin = db => Math.pow(10, db / 20);
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+const PENTA = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21];
+const pent = i => mtof(69 + PENTA[((i % PENTA.length) + PENTA.length) % PENTA.length]);
+const CHORDS = [[57,60,64,71],[53,57,60,64],[48,55,59,62],[55,59,62,64]]; /* Am9 · Fmaj7 · Cmaj9 · G6 */
+
+const EVENTS = [];
+function ev(t, type, o) { EVENTS.push(Object.assign({ t: q(t), type: type }, o || {})); }
+(function buildEvents(){
+  /* --- musiqa to'ri --- */
+  for (let bar = 0; bar * 4 * BEAT < DURATION + .01; bar++) {
+    const barT = bar * 4 * BEAT, chord = CHORDS[Math.floor(bar / 2) % 4];
+    ev(barT, 'pad', { chord: chord });
+    for (let b = 0; b < 4; b++) {
+      const bt = barT + b * BEAT;
+      if (bt >= DURATION) continue;
+      const halfTime = bt >= SCENES[6].start && bt < SCENES[6].start + SCENES[6].dur;  /* taklif: half-time */
+      if (bt >= 4 && (b === 0 || b === 2)) {
+        ev(bt, 'bass', { m: chord[0] - 24 });
+        if (b === 0 || !halfTime) ev(bt, 'kick');
+      }
+      if (bt >= 7) { ev(bt, 'hat', { vel: .9 }); ev(bt + BEAT / 2, 'hat', { vel: .6 }); }
+      if (bt >= 4) ev(bt, 'pluck', { m: chord[(bar + b) % 4] + 12, vel: b % 2 ? .8 : 1 });
+    }
+  }
+  /* --- riser / impact / cut --- */
+  ev(0.4, 'riser', { dur: 1.6 });
+  ev(2.0, 'impact');
+  ev(16.2, 'riser', { dur: 1.7, vel: .9 });
+  for (let i = 1; i < N_SCENES; i++) ev(SCENES[i].start, 'cut', { i: i });
+  ev(19.2, 'sheen'); ev(21.6, 'sheen');
+  /* --- DOM hodisalari (ko'rinish va tovush bir manbadan) --- */
+  let seq = 0;
+  $$('[data-sfx-type]').forEach(el => {
+    const holder = el.closest('[data-scene]'); if (!holder) return;
+    const si = +holder.dataset.scene, delay = (parseFloat(el.dataset.sfxDelay) || 0) / 1000;
+    const type = el.dataset.sfxType, t0 = SCENES[si].start + delay;
+    if (type === 'type') {
+      const dur = parseFloat(el.dataset.dur) || 1.2, n = Math.floor(dur / .075);
+      for (let k = 0; k < n; k++) ev(t0 + k * .075, 'type', { seed: k });
+    } else ev(t0, type, { seed: seq++ });
+  });
+  /* saralash: 40 ms ichidagi kolliziyalar — ustunlik bo'yicha (faqat SFX; 'cut' har doim qoladi) */
+  const FLEX = { impact: 1, cta: 1, price: 1, headline: 1, feature: 1, badge: 1, subtext: 1, sheen: 1, type: 1 };
+  EVENTS.sort((a, b) => (a.t - b.t) || ((PRIO[b.type] || 0) - (PRIO[a.type] || 0)));
+  const kept = [];
+  for (let i = 0; i < EVENTS.length; i++) {
+    const e = EVENTS[i];
+    if (!FLEX[e.type]) { kept.push(e); continue; }
+    let drop = false;
+    for (let j = kept.length - 1; j >= 0; j--) {
+      if (kept[j].t < e.t - .04) break;
+      if (!FLEX[kept[j].type]) continue;
+      if (Math.abs(kept[j].t - e.t) < .04 && (PRIO[kept[j].type] || 0) > (PRIO[e.type] || 0)) { drop = true; break; }
+    }
+    if (!drop) kept.push(e);
+  }
+  EVENTS.length = 0; kept.forEach(e => EVENTS.push(e));
+})();
+
+const MASTER_GAIN = 2.0; /* ffmpeg ebur128 bo'yicha sozlash nuqtasi (sezar 9) */
+
+function buildGraph(ctx) {
+  const g = { ctx: ctx, live: [] };
+  g.music = ctx.createGain(); g.music.gain.value = 1;
+  g.sfx = ctx.createGain(); g.sfx.gain.value = 1;
+  g.dry = ctx.createGain(); g.dry.gain.value = 1;
+  g.verb = ctx.createConvolver();
+  g.verb.buffer = makeIR(ctx, 1.6, 2.4);
+  g.wet = ctx.createGain(); g.wet.gain.value = 1;   /* reverb send bus */
+  g.music.connect(g.dry); g.sfx.connect(g.dry);
+  g.verb.connect(g.wet); g.wet.connect(g.dry);
+  g.hp = ctx.createBiquadFilter(); g.hp.type = 'highpass'; g.hp.frequency.value = 30;
+  g.dry.connect(g.hp);
+  g.comp = ctx.createDynamicsCompressor();
+  g.comp.threshold.value = -20; g.comp.knee.value = 24; g.comp.ratio.value = 3;
+  g.comp.attack.value = .01; g.comp.release.value = .25;
+  g.lim = ctx.createDynamicsCompressor();
+  g.lim.threshold.value = -4; g.lim.knee.value = 0; g.lim.ratio.value = 20;
+  g.lim.attack.value = .002; g.lim.release.value = .08;
+  g.fader = ctx.createGain(); g.fader.gain.value = 1;
+  g.master = ctx.createGain(); g.master.gain.value = MASTER_GAIN;
+  g.hp.connect(g.comp); g.comp.connect(g.lim); g.lim.connect(g.fader); g.fader.connect(g.master);
+  g.master.connect(ctx.destination);
+  g.noise = makeNoise(ctx);
+  return g;
+}
+function makeIR(ctx, sec, decay) {
+  const r = mulberry32(CONFIG.seed + 7);
+  const len = Math.max(1, Math.floor(ctx.sampleRate * sec));
+  const b = ctx.createBuffer(2, len, ctx.sampleRate);
+  let lp = 0;
+  for (let c = 0; c < 2; c++) {
+    const d = b.getChannelData(c);
+    for (let i = 0; i < len; i++) {
+      lp = lp * .72 + (r() * 2 - 1) * .28;                       /* pastki filtr */
+      d[i] = lp * Math.pow(1 - i / len, decay);
+    }
+  }
+  return b;
+}
+function makeNoise(ctx) {
+  const r = mulberry32(CONFIG.seed + 13);
+  const len = Math.floor(ctx.sampleRate * 1);
+  const b = ctx.createBuffer(1, len, ctx.sampleRate), d = b.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = r() * 2 - 1;
+  return b;
+}
+function track(g, node) { if (g.live) g.live.push(node); }
+
+function voice(g, dest, f, when, dur, db, type, glideTo, pan, att) {
+  const o = g.ctx.createOscillator(), gn = g.ctx.createGain();
+  o.type = type || 'sine';
+  o.frequency.setValueAtTime(f, when);
+  if (glideTo) o.frequency.exponentialRampToValueAtTime(Math.max(30, glideTo), when + dur * .85);
+  const a = Math.min(att || .012, dur * .3);
+  gn.gain.setValueAtTime(.0001, when);
+  gn.gain.exponentialRampToValueAtTime(Math.max(.0002, dbLin(db)), when + a);
+  gn.gain.exponentialRampToValueAtTime(.0001, when + dur);
+  o.connect(gn);
+  if (g.ctx.createStereoPanner && pan) { const p = g.ctx.createStereoPanner(); p.pan.value = pan; gn.connect(p); p.connect(dest); }
+  else gn.connect(dest);
+  o.start(when); o.stop(when + dur + .04); track(g, o);
+  return gn;
+}
+function noiseHit(g, dest, when, dur, db, hp, lp, pan, q) {
+  const s = g.ctx.createBufferSource(); s.buffer = g.noise;
+  const f1 = g.ctx.createBiquadFilter(); f1.type = 'highpass'; f1.frequency.value = hp;
+  const f2 = g.ctx.createBiquadFilter(); f2.type = 'lowpass'; f2.frequency.value = lp; f2.Q.value = q || .7;
+  const gn = g.ctx.createGain();
+  gn.gain.setValueAtTime(.0001, when);
+  gn.gain.exponentialRampToValueAtTime(Math.max(.0002, dbLin(db)), when + .01);
+  gn.gain.exponentialRampToValueAtTime(.0001, when + dur);
+  s.connect(f1); f1.connect(f2); f2.connect(gn);
+  if (g.ctx.createStereoPanner && pan) { const p = g.ctx.createStereoPanner(); p.pan.value = pan; gn.connect(p); p.connect(dest); }
+  else gn.connect(dest);
+  const off = ((when * 7919) % 1) * .8;
+  s.start(when, off, dur + .05); s.stop(when + dur + .06); track(g, s);
+  return gn;
+}
+function duck(g, when) {
+  const p = g.music.gain;
+  p.setValueAtTime(1, when);
+  p.linearRampToValueAtTime(.6, when + .05);
+  p.linearRampToValueAtTime(1, when + .55);
+}
+function send(g, node, amt) { if (!amt) return; const s = g.ctx.createGain(); s.gain.value = amt; node.connect(s); s.connect(g.verb); track(g, s); }
+
+function playEvent(g, e, when) {
+  const sd = e.seed || 0;
+  switch (e.type) {
+    case 'pad': {
+      const ch = e.chord;
+      send(g, voice(g, g.music, mtof(ch[2]), when, 4.2, -22, 'sawtooth', null, -.1, .8), .18);
+      send(g, voice(g, g.music, mtof(ch[2]) * 1.004, when, 4.2, -25, 'sawtooth', null, .1, .8), .18);
+      voice(g, g.music, mtof(ch[1]), when, 4.2, -24, 'sine', null, 0, .8);
+      break;
+    }
+    case 'bass':
+      voice(g, g.music, mtof(e.m), when, .35, -18, 'sine');
+      voice(g, g.music, mtof(e.m) * 2, when, .28, -26, 'triangle');
+      break;
+    case 'kick':
+      voice(g, g.music, 110, when, .13, -20, 'sine', 45);
+      noiseHit(g, g.music, when, .02, -34, 1200, 5200);
+      break;
+    case 'hat':
+      noiseHit(g, g.music, when, .03, -30, 7000, 10000, sd % 2 ? .25 : -.25);
+      break;
+    case 'pluck':
+      send(g, voice(g, g.music, mtof(e.m), when, .26, -24, 'triangle'), .25);
+      break;
+    case 'riser': {
+      const dur = e.dur || 1.6;
+      noiseHit(g, g.music, when, dur, -20, 400, 6000, 0, 3.2);
+      voice(g, g.music, 220, when, dur, -24, 'sine', 440);
+      break;
+    }
+    case 'impact':
+      voice(g, g.sfx, 55, when, .6, -12, 'sine', 38);
+      send(g, noiseHit(g, g.sfx, when, .25, -14, 200, 2000, 0, .7), .3);
+      send(g, noiseHit(g, g.sfx, when, .8, -20, 800, 4000, 0, .7), .35);
+      duck(g, when);
+      break;
+    case 'whoosh':
+      send(g, noiseHit(g, g.sfx, when, .35, -24, 600, 3500, e.pan || 0, 2.4), .2);
+      break;
+    case 'cut':
+      voice(g, g.sfx, pent(e.i), when, .26, -22, 'sine');
+      voice(g, g.sfx, pent(e.i) * 2, when, .18, -30, 'triangle');
+      send(g, noiseHit(g, g.sfx, when, .35, -24, 600, 3500, e.i % 2 ? .5 : -.5, 2.4), .2);
+      break;
+    case 'headline':
+      voice(g, g.sfx, 180, when, .14, -13, 'sine', 120);
+      noiseHit(g, g.sfx, when, .08, -22, 900, 5200);
+      break;
+    case 'subtext':
+      voice(g, g.sfx, pent(3) * 2, when, .06, -26, 'triangle');
+      break;
+    case 'badge':
+      voice(g, g.sfx, 600 * Math.pow(1.0595, sd % 5), when, .08, -20, 'sine', 900);
+      break;
+    case 'feature': {
+      const f = pent(sd) * 2;
+      send(g, voice(g, g.sfx, f, when, .12, -19, 'sine'), .2);
+      voice(g, g.sfx, f * 1.5, when, .1, -24, 'sine');
+      break;
+    }
+    case 'type':
+      noiseHit(g, g.sfx, when, .012, -26, 3000, 10000);
+      voice(g, g.sfx, 900 * (1 + ((sd % 7) - 3) / 100), when, .015, -28, 'sine');
+      break;
+    case 'price':
+      send(g, voice(g, g.sfx, 1046, when, .5, -14, 'sine'), .25);
+      send(g, voice(g, g.sfx, 1568, when + .09, .42, -16, 'sine'), .25);
+      voice(g, g.sfx, 2885, when + .09, .16, -30, 'sine');
+      voice(g, g.sfx, 1568 * 2.76, when + .09, .12, -34, 'sine');
+      duck(g, when);
+      break;
+    case 'cta': {
+      const root = pent(4);
+      [1, 1.5, 2, 3].forEach((r, i) => {
+        send(g, voice(g, g.sfx, root * r, when + i * .03, .9 - i * .1, -11 - i, 'triangle'), .3);
+        voice(g, g.sfx, root * r, when + i * .03, .7, -18 - i, 'sine');
+      });
+      duck(g, when);
+      break;
+    }
+    case 'sheen':
+      send(g, voice(g, g.sfx, 2637, when, .09, -26, 'sine'), .3);
+      break;
+  }
+}
+function scheduleEvent(g, e, base) { playEvent(g, e, base + e.t); }
+
+function armTail(g, base) {
+  const tEnd = base + DURATION;
+  g.fader.gain.setValueAtTime(1, Math.max(base, tEnd - 1.2));
+  g.fader.gain.linearRampToValueAtTime(0.0001, tEnd);
+}
+function scheduleAll(g, base, until) {
+  const lim = until == null ? DURATION : until;
+  for (let i = 0; i < EVENTS.length; i++) {
+    const e = EVENTS[i];
+    if (e.t > lim) break;
+    if (base + e.t < 0) continue;
+    scheduleEvent(g, e, base);
+  }
+  armTail(g, base + lim);
+}
+
+/* --- live o'qish --- */
+const A = { ctx: null, g: null, on: true, muted: false, started: false, base: 0, next: 0, timer: null, dead: false };
+function audioInit() {
+  if (A.ctx || A.dead) return;
+  const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+  A.ctx = new AC();
+  A.g = buildGraph(A.ctx);
+  A.base = A.ctx.currentTime + .08;
+  A.next = 0;
+  A.timer = setInterval(audioTick, 120);
+}
+function audioStart() {
+  if (!A.ctx || A.started) return;
+  if (A.ctx.state === 'suspended') A.ctx.resume();
+  if (A.ctx.state !== 'running') return;      /* faqat ctx running bo'lganda */
+  A.started = true;
+  A.base = A.ctx.currentTime + .06;
+  A.next = 0;
+  g_playFrom = 0;
+  armTail(A.g, A.base);
+  playEvent(A.g, { t: 0, type: 'subtext' }, A.base + .02);   /* start chime */
+  audioTick();
+}
+function audioSeek(tNow) {                    /* joriy vaqtdan qayta rejalashtirish */
+  if (!A.ctx || !A.g) return;
+  stopLive(A.g);
+  A.base = A.ctx.currentTime - tNow;
+  A.next = 0;
+  while (A.next < EVENTS.length && EVENTS[A.next].t < tNow) A.next++;
+  if (A.started) armTail(A.g, A.base);
+}
+function audioTick() {
+  if (!A.ctx || A.ctx.state !== 'running' || A.muted) return;
+  const now = A.ctx.currentTime, t = now - A.base;
+  if (t >= DURATION) { audioLoop(); return; }
+  while (A.next < EVENTS.length && EVENTS[A.next].t < t + .7) {
+    playEvent(A.g, EVENTS[A.next], A.base + EVENTS[A.next].t);
+    A.next++;
+  }
+}
+function stopLive(g) {
+  if (!g || !g.live) return;
+  const now = g.ctx.currentTime;
+  for (let i = 0; i < g.live.length; i++) { try { g.live[i].stop(now); } catch (e) {} try { g.live[i].disconnect(); } catch (e) {} }
+  g.live.length = 0;
+  try { g.fader.gain.cancelScheduledValues(now); g.fader.gain.setValueAtTime(1, now); } catch (e) {}
+  try { g.music.gain.cancelScheduledValues(now); g.music.gain.setValueAtTime(1, now); } catch (e) {}
+}
+function audioLoop() {
+  stopLive(A.g);
+  A.base = A.ctx.currentTime + .05;
+  A.next = 0;
+  g_playFrom = 0;
+  armTail(A.g, A.base);
+}
+function audioMute() {
+  if (!A.ctx || !A.g) return;
+  const t = A.ctx.currentTime;
+  A.g.master.gain.cancelScheduledValues(t);
+  A.g.master.gain.setValueAtTime(A.muted ? .0001 : MASTER_GAIN, t);
+  if (A.muted) { stopLive(A.g); A.next = 0; }
+}
+function audioDispose() {
+  A.dead = true;
+  if (A.timer) clearInterval(A.timer); A.timer = null;
+  if (A.ctx) { try { A.ctx.close(); } catch (e) {} }
+  A.ctx = null; A.g = null;
+}
+
+/* ================================================================
+   9) OFFLINE RENDER (MP4 uchun WAV)
+   ================================================================ */
+function encodeWav(buf) {
+  const ch = buf.numberOfChannels, len = buf.length, sr = buf.sampleRate;
+  const ab = new ArrayBuffer(44 + len * ch * 2), dv = new DataView(ab);
+  const str = (o, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i)); };
+  str(0, 'RIFF'); dv.setUint32(4, 36 + len * ch * 2, true); str(8, 'WAVE'); str(12, 'fmt ');
+  dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, ch, true);
+  dv.setUint32(24, sr, true); dv.setUint32(28, sr * ch * 2, true);
+  dv.setUint16(32, ch * 2, true); dv.setUint16(34, 16, true); str(36, 'data');
+  dv.setUint32(40, len * ch * 2, true);
+  const chans = []; for (let c = 0; c < ch; c++) chans.push(buf.getChannelData(c));
+  let o = 44;
+  for (let i = 0; i < len; i++) for (let c = 0; c < ch; c++) {
+    const s = Math.max(-1, Math.min(1, chans[c][i]));
+    dv.setInt16(o, s < 0 ? s * 0x8000 : s * 0x7FFF, true); o += 2;
+  }
+  const u8 = new Uint8Array(ab); let bin = '';
+  for (let i = 0; i < u8.length; i += 0x8000) bin += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+async function renderAudioWav() {
+  const sr = 48000;
+  const oc = new OfflineAudioContext(2, Math.ceil(DURATION * sr), sr);
+  const g = buildGraph(oc);
+  scheduleAll(g, 0, DURATION);
+  const buf = await oc.startRendering();
+  return encodeWav(buf);
+}
+
+/* ================================================================
+   10) PLAYER, O'LCHOV, HODISA
+   ============================================================ */
+const stage = $('#stage');
+let g_playFrom = 0, g_last = 0, g_raf = null, g_running = false, g_unlocked = false;
+function fitStage() {
+  const k = Math.min(window.innerWidth / 1080, window.innerHeight / 1920);
+  stage.style.transform = 'translate(-50%,-50%) scale(' + k + ')';
+}
+addEventListener('resize', fitStage, { passive: true });
+fitStage();
+
+function playhead() {
+  if (EXPORT) return g_playFrom;
+  if (A.ctx && A.started && A.ctx.state === 'running') return Math.max(0, A.ctx.currentTime - A.base);
+  return g_playFrom;
+}
+function loop(ts) {
+  g_raf = requestAnimationFrame(loop);
+  if (!g_running) { g_last = ts; return; }
+  const t = playhead();
+  g_playFrom = t;
+  if (t >= DURATION) { g_playFrom = 0; if (A.started) audioLoop(); }
+  renderAt(g_playFrom);
+  g_last = ts;
+}
+function startPlayer() { if (!g_running) { g_running = true; } }
+function pausePlayer() { g_running = false; }
+
+if (EXPORT) {
+  document.body.classList.add('export');
+  renderAt(0);
+} else {
+  g_running = true;
+  g_raf = requestAnimationFrame(loop);
+}
+
+function firstGesture() {
+  if (g_unlocked) return;
+  g_unlocked = true;
+  audioInit();
+  audioStart();          /* birinchi bosish ovozni OCHIQ qoldiradi */
+  ['pointerdown','keydown','touchstart'].forEach(ev2 => removeEventListener(ev2, firstGesture, true));
+}
+['pointerdown','keydown','touchstart'].forEach(ev2 => addEventListener(ev2, firstGesture, true));
+
+const sBtn = $('#soundBtn');
+sBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  audioInit();
+  A.muted = !A.muted;
+  A.on = !A.muted;
+  sBtn.setAttribute('aria-pressed', String(!A.muted));
+  sBtn.setAttribute('aria-label', A.muted ? 'Ovozni yo‘qish' : 'Ovozni o‘chirish');
+  audioMute();
+  if (!A.muted && A.ctx && A.ctx.state === 'suspended') A.ctx.resume();
+  if (!A.muted && A.ctx && A.ctx.state === 'running' && !A.started) audioStart();
+  if (!A.muted && A.started) audioSeek(Math.max(0, playhead()));
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { pausePlayer(); if (A.ctx) A.ctx.suspend(); }
+  else { if (!EXPORT) { startPlayer(); if (A.ctx) A.ctx.resume(); } }
+});
+addEventListener('pagehide', audioDispose);
+
+/* ================================================================
+   11) EKSPORT API + SELFTEST
+   ================================================================ */
+window.__FPS = FPS;
+window.__DURATION = DURATION;
+window.__SCENES = SCENES;
+window.__EVENTS = EVENTS;
+window.__renderAt = renderAt;
+window.__renderAudioWav = renderAudioWav;
+window.__masterGain = MASTER_GAIN;
+window.__ready = Promise.all([
+  document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve(),
+  CONFIG.image ? new Promise(res => { const i = new Image(); i.onload = i.onerror = res; i.src = CONFIG.image; }) : Promise.resolve()
+]).then(() => { renderAt(0); return true; });
+
+window.__selftest = function () {
+  const r = [];
+  const ids = $$('[id]').map(n => n.id);
+  r.push(['unique ids', ids.length === new Set(ids).size]);
+  r.push(['bars = scenes', BARS.length === N_SCENES]);
+  r.push(['scene nodes', SCENE_EL.every(Boolean) && SCENE_EL.length === N_SCENES]);
+  r.push(['duration sum', Math.abs(DURATION - SCENES.reduce((a, s) => a + s.dur, 0)) < 1e-9]);
+  r.push(['scene visible at t=0', SCENE_EL[0].style.visibility === 'visible']);
+  r.push(['cuts = scenes-1', EVENTS.filter(e => e.type === 'cut').length === N_SCENES - 1]);
+  r.push(['one impact', EVENTS.filter(e => e.type === 'impact').length === 1]);
+  r.push(['price + cta sounds', EVENTS.some(e => e.type === 'price') && EVENTS.some(e => e.type === 'cta')]);
+  r.push(['sound for every cue', $$('[data-sfx-type]').every(el => {
+      const h = el.closest('[data-scene]'); if (!h) return false;
+      const t0 = SCENES[+h.dataset.scene].start + (parseFloat(el.dataset.sfxDelay) || 0) / 1000;
+      return EVENTS.some(e => e.type === el.dataset.sfxType && Math.abs(e.t - t0) < 1e-6);
+    })]);
+  const a = renderAt(5), snap = SCENE_EL.map(n => n.style.opacity + n.style.visibility).join('|');
+  renderAt(5);
+  const snap2 = SCENE_EL.map(n => n.style.opacity + n.style.visibility).join('|');
+  r.push(['idempotent @5s', snap === snap2]);
+  r.push(['durations', SCENES.map(s => s.id + ':' + s.dur).join(', ')]);
+  r.push(['events', EVENTS.length + ' · ' + a.toFixed(2) + 's']);
+  r.forEach(x => console.log((x[1] === true ? 'PASS' : typeof x[1] === 'boolean' ? 'FAIL' : 'INFO') + ' — ' + x[0] + (typeof x[1] === 'boolean' && x[1] ? '' : ' : ' + x[1])));
+  const fails = r.filter(x => x[1] === false).length;
+  console.log(fails ? fails + ' ta tekshiruv muvaffaqiyatsiz' : 'barcha tekshiruvlar o‘tdi');
+  return r;
+};
+if (SELFTEST) window.__ready.then(() => window.__selftest());
+</script>
+</body>
+</html>
