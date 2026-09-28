@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AeroPods Pro — reklama</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ RESET / BASE ============ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#12161A;
+  --ink-2:#4A5560;
+  --ink-3:#8A96A2;
+  --paper:#F6F5F1;
+  --card:rgba(255,255,255,.78);
+  --line:rgba(18,22,26,.10);
+  --acc:#0FB39B;            /* product-derived primary accent */
+  --acc-2:#0A7F8C;          /* secondary accent */
+  --acc-soft:rgba(15,179,155,.14);
+  --shadow-card:0 calc(var(--u,10px)*.35) calc(var(--u,10px)*1.5) rgba(18,22,26,.08);
+  --shadow-hero:0 calc(var(--u,10px)*1.2) calc(var(--u,10px)*3.2) rgba(18,22,26,.20);
+}
+html,body{height:100%}
+body{
+  background:radial-gradient(120% 90% at 50% 0%,#FBFAF8 0%,#EFEDE8 60%,#E6E4DF 100%);
+  font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+
+/* ============ STAGE + FRAME ============ */
+.stage{position:relative;width:100%;display:flex;align-items:center;justify-content:center;padding:12px}
+.frame{
+  --u:clamp(6.2px,4.05vw,16px);
+  position:relative;width:100%;
+  max-width:min(430px,calc((100svh - 24px) * 9 / 16));
+  aspect-ratio:9/16;
+  border-radius:calc(var(--u)*3.4);
+  overflow:hidden;
+  background:var(--paper);
+  box-shadow:0 calc(var(--u)*.6) calc(var(--u)*4) rgba(18,22,26,.18),0 0 0 1px rgba(255,255,255,.7) inset;
+  isolation:isolate;
+  container-type:size;
+}
+@supports (container-type:size){ .frame{ --u:clamp(7px,1.52cqh,17px) } }
+
+.defs{position:absolute;width:0;height:0;overflow:hidden}
+
+/* ============ AMBIENT BACKGROUND ============ */
+.bg{position:absolute;inset:0;z-index:0;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(calc(var(--u)*2.6));opacity:.55;will-change:transform}
+.blob.b1{width:74%;padding-bottom:74%;left:-22%;top:4%;background:radial-gradient(circle at 40% 40%,rgba(15,179,155,.30),rgba(15,179,155,0) 68%);animation:drift1 26s ease-in-out infinite}
+.blob.b2{width:66%;padding-bottom:66%;right:-18%;top:30%;background:radial-gradient(circle at 55% 45%,rgba(10,127,140,.24),rgba(10,127,140,0) 70%);animation:drift2 32s ease-in-out infinite}
+.blob.b3{width:78%;padding-bottom:78%;left:-10%;bottom:-14%;background:radial-gradient(circle at 50% 50%,rgba(255,214,180,.30),rgba(255,214,180,0) 70%);animation:drift3 38s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(6%,7%,0) scale(1.12)}}
+@keyframes drift2{0%,100%{transform:translate3d(0,0,0) scale(1.05)}50%{transform:translate3d(-8%,5%,0) scale(.94)}}
+@keyframes drift3{0%,100%{transform:translate3d(0,0,0) scale(.98)}50%{transform:translate3d(7%,-6%,0) scale(1.1)}}
+.bg-wash{position:absolute;inset:0;background:radial-gradient(75% 55% at 50% 42%,rgba(255,255,255,.92),rgba(255,255,255,0) 72%)}
+
+.fx{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+
+.frame::before{ /* film grain */
+  content:"";position:absolute;inset:-2%;z-index:6;pointer-events:none;opacity:.045;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.frame::after{ /* vignette */
+  content:"";position:absolute;inset:0;z-index:5;pointer-events:none;
+  background:radial-gradient(78% 58% at 50% 44%,rgba(0,0,0,0) 55%,rgba(18,22,26,.13) 100%);
+}
+
+/* ============ PROGRESS ============ */
+.progress{
+  position:absolute;left:calc(var(--u)*2.2);right:calc(var(--u)*2.2);
+  top:calc(env(safe-area-inset-top,0px) + var(--u)*1.5);
+  z-index:12;display:flex;gap:calc(var(--u)*.55);
+}
+.bar{flex:1;height:calc(var(--u)*.3);border-radius:99px;background:rgba(18,22,26,.14);overflow:hidden}
+.bar-fill{width:100%;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--acc),var(--acc-2));transform:scaleX(0);transform-origin:left center;will-change:transform}
+
+/* ============ SOUND BUTTON ============ */
+.sound{
+  position:absolute;right:calc(var(--u)*1.6);bottom:calc(env(safe-area-inset-bottom,0px) + var(--u)*1.6);
+  z-index:14;width:calc(var(--u)*3.1);height:calc(var(--u)*3.1);border-radius:50%;
+  display:grid;place-items:center;cursor:pointer;
+  border:1px solid rgba(18,22,26,.10);
+  background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  color:var(--ink);box-shadow:var(--shadow-card);
+  transition:transform .2s ease,background .2s ease,opacity .2s ease;
+}
+.sound:active{transform:scale(.93)}
+.sound svg{width:calc(var(--u)*1.55);height:calc(var(--u)*1.55);display:block}
+.sound .i-off{display:none}
+.sound[data-state="off"] .i-on{display:none}
+.sound[data-state="off"] .i-off{display:block}
+.sound[data-state="off"]{color:var(--ink-3)}
+
+/* ============ SCENES ============ */
+.scene{
+  position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top,0px) + var(--u)*4.6) calc(var(--u)*3.1) calc(env(safe-area-inset-bottom,0px) + var(--u)*3.4);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .55s ease,visibility .55s linear;
+}
+.scene.is-active{opacity:1;visibility:visible;pointer-events:auto;z-index:4}
+
+.eyebrow{
+  align-self:flex-start;display:inline-flex;align-items:center;gap:calc(var(--u)*.6);
+  font:600 calc(var(--u)*2.05)/1 'Inter',sans-serif;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--acc-2);
+}
+.eyebrow::before{content:"";width:calc(var(--u)*2.2);height:2px;border-radius:2px;background:linear-gradient(90deg,var(--acc),var(--acc-2))}
+
+.h1{font-family:'Sora',system-ui,sans-serif;font-weight:800;letter-spacing:-.035em;line-height:.98;
+  font-size:calc(var(--u)*7.4);color:var(--ink);
+  background:linear-gradient(180deg,#1B2229,#0C1114);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.h2{font-family:'Sora',system-ui,sans-serif;font-weight:700;letter-spacing:-.028em;line-height:1.06;font-size:calc(var(--u)*4.3);color:var(--ink)}
+.lead{font-size:calc(var(--u)*2.7);line-height:1.45;color:var(--ink-2);font-weight:400;max-width:88%}
+.micro{font-size:calc(var(--u)*2);line-height:1.4;color:var(--ink-3)}
+
+.grow{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:center}
+
+/* ---------- entrance ---------- */
+@keyframes riseIn{from{opacity:0;transform:translate3d(0,calc(var(--u)*2.6),0) scale(.985)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideL{from{opacity:0;transform:translate3d(calc(var(--u)*-2.4),0,0)}to{opacity:1;transform:none}}
+.scene.is-active .anim{animation:riseIn .72s cubic-bezier(.16,.84,.3,1) both;animation-delay:var(--d,0ms)}
+.scene.is-active .a-fade{animation:fadeIn .9s ease both;animation-delay:var(--d,0ms)}
+.scene.is-active .a-left{animation:slideL .8s cubic-bezier(.16,.84,.3,1) both;animation-delay:var(--d,0ms)}
+
+/* ---------- camera ---------- */
+@keyframes pushIn{from{transform:translate3d(0,1.2%,0) scale(1.10)}to{transform:translate3d(0,0,0) scale(1.0)}}
+@keyframes pushInAlt{from{transform:translate3d(0,-1%,0) scale(1.08)}to{transform:translate3d(0,0,0) scale(1.0)}}
+.scene.is-active .cam-s1{animation:pushIn var(--cd,4000ms) cubic-bezier(.22,.61,.36,1) both}
+.scene.is-active .cam-s2{animation:pushInAlt var(--cd,4000ms) cubic-bezier(.22,.61,.36,1) both}
+.scene.is-active .cam-s3{animation:pushIn var(--cd,4000ms) cubic-bezier(.22,.61,.36,1) both}
+.scene.is-active .cam-s4{animation:pushInAlt var(--cd,4000ms) cubic-bezier(.22,.61,.36,1) both}
+.scene.is-active .cam-s5{animation:pushIn var(--cd,4000ms) cubic-bezier(.22,.61,.36,1) both}
+
+/* ---------- product stage ---------- */
+.p-stage{position:relative;display:flex;align-items:center;justify-content:center;flex:0 0 auto;will-change:transform}
+.prod{width:100%;height:100%;display:block;overflow:visible}
+.floor-glow{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,rgba(15,179,155,.30),rgba(15,179,155,0) 70%);filter:blur(calc(var(--u)*1.6));z-index:-1}
+.float{animation:float 6.5s ease-in-out infinite;transform-origin:50% 60%}
+@keyframes float{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,calc(var(--u)*-.9),0)}}
+.sheen{animation:sheen 7.5s ease-in-out infinite}
+@keyframes sheen{0%,100%{opacity:.25}45%{opacity:.75}}
+
+/* ---------- scene 1 ---------- */
+.s1 .p-stage{height:calc(var(--u)*23);margin:calc(var(--u)*1.2) 0 calc(var(--u)*1.4)}
+.s1 .floor-glow{width:78%;padding-bottom:78%;top:58%}
+.s1 .h1{margin-bottom:calc(var(--u)*1.1)}
+
+/* ---------- scene 2 ---------- */
+.s2 .p-stage{height:calc(var(--u)*13);margin:calc(var(--u)*1) 0 calc(var(--u)*.6)}
+.s2 .floor-glow{width:52%;padding-bottom:52%;top:62%;opacity:.8}
+.s2 .head{margin-bottom:calc(var(--u)*1.8)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*1.1);margin-top:calc(var(--u)*1.4)}
+.card{
+  position:relative;border-radius:calc(var(--u)*1.9);padding:calc(var(--u)*1.5) calc(var(--u)*1.4);
+  background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow-card);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+.card .n{font:700 calc(var(--u)*1.9)/1 'Sora',sans-serif;color:var(--acc-2);letter-spacing:-.02em;display:block;margin-bottom:calc(var(--u)*.6)}
+.card .t{font:600 calc(var(--u)*2.45)/1.18 'Sora',sans-serif;color:var(--ink);display:block;letter-spacing:-.015em}
+.card .d{font-size:calc(var(--u)*2.05);line-height:1.34;color:var(--ink-2);margin-top:calc(var(--u)*.5);display:block}
+.card::after{content:"";position:absolute;left:calc(var(--u)*1.4);top:calc(var(--u)*1.5);width:calc(var(--u)*1.5);height:2px;border-radius:2px;background:linear-gradient(90deg,var(--acc),var(--acc-2));opacity:.7}
+.foot-note{margin-top:calc(var(--u)*1.3);font-size:calc(var(--u)*1.85);color:var(--ink-3)}
+
+/* ---------- scene 3 ---------- */
+.s3 .stage-wrap{position:relative;flex:1 1 auto;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.s3 .p-stage{position:absolute;width:96%;height:auto;aspect-ratio:1/1;z-index:1}
+.s3 .p-stage .floor-glow{width:70%;padding-bottom:70%;top:56%}
+.s3 .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(246,245,241,.72) 0%,rgba(246,245,241,.10) 40%,rgba(246,245,241,.86) 88%);z-index:2;pointer-events:none}
+.s3 .quote{position:relative;z-index:3;text-align:left;max-width:94%}
+.s3 .q{font-family:'Sora',sans-serif;font-weight:700;letter-spacing:-.03em;line-height:1.08;font-size:calc(var(--u)*5.4);color:var(--ink)}
+.s3 .rule{width:calc(var(--u)*5);height:2px;border-radius:2px;background:linear-gradient(90deg,var(--acc),var(--acc-2));margin:calc(var(--u)*1.6) 0}
+
+/* ---------- scene 4 ---------- */
+.s4 .p-stage{position:absolute;right:calc(var(--u)*-3.4);top:calc(var(--u)*11);width:62%;height:auto;aspect-ratio:1/1;z-index:1;opacity:.95}
+.s4 .p-stage .floor-glow{width:66%;padding-bottom:66%;top:62%}
+.s4 .veil{position:absolute;inset:0;background:linear-gradient(95deg,rgba(246,245,241,.97) 34%,rgba(246,245,241,.55) 66%,rgba(246,245,241,.20) 100%);z-index:2;pointer-events:none}
+.s4 .body{position:relative;z-index:3;display:flex;flex-direction:column;height:100%}
+.price{display:flex;align-items:baseline;gap:calc(var(--u)*.8);margin:calc(var(--u)*.6) 0 calc(var(--u)*.4)}
+.price .num{font-family:'Sora',sans-serif;font-weight:800;letter-spacing:-.05em;font-size:calc(var(--u)*11.5);line-height:.9;
+  background:linear-gradient(120deg,var(--acc),var(--acc-2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.price .cur{font:600 calc(var(--u)*3.2)/1 'Sora',sans-serif;color:var(--acc-2)}
+.price-slot{
+  display:inline-flex;align-items:center;justify-content:center;align-self:flex-start;
+  font:700 calc(var(--u)*5.6)/1 'Sora',sans-serif;letter-spacing:-.03em;color:var(--ink-3);
+  border:2px dashed rgba(18,22,26,.22);border-radius:calc(var(--u)*2);
+  padding:calc(var(--u)*1.5) calc(var(--u)*2.2);margin:calc(var(--u)*1) 0 calc(var(--u)*.6);
+}
+.pulse{animation:pulse 3.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{filter:drop-shadow(0 0 0 rgba(15,179,155,0))}50%{filter:drop-shadow(0 calc(var(--u)*.3) calc(var(--u)*1.2) rgba(15,179,155,.35))}}
+.offer-list{list-style:none;margin-top:calc(var(--u)*1.4);display:flex;flex-direction:column;gap:calc(var(--u)*.9)}
+.offer-list li{display:flex;align-items:center;gap:calc(var(--u)*.8);font-size:calc(var(--u)*2.5);color:var(--ink-2)}
+.offer-list .tick{width:calc(var(--u)*1.5);height:calc(var(--u)*1.5);flex:0 0 auto;border-radius:50%;background:var(--acc-soft);
+  display:grid;place-items:center;color:var(--acc-2);font-size:calc(var(--u)*1.05);font-weight:700;line-height:1}
+.offer-list .ph{border-bottom:1.5px dashed rgba(18,22,26,.22);color:var(--ink-3)}
+
+/* ---------- scene 5 ---------- */
+.s5{align-items:center;text-align:center;padding-left:calc(var(--u)*3.1);padding-right:calc(var(--u)*3.1)}
+.s5 .p-stage{height:calc(var(--u)*17);width:100%;margin-bottom:calc(var(--u)*.6)}
+.s5 .floor-glow{width:66%;padding-bottom:66%;top:56%}
+.s5 .h1{font-size:calc(var(--u)*6)}
+.s5 .lead{margin:calc(var(--u)*.9) auto 0;max-width:82%}
+.cta{
+  display:inline-flex;align-items:center;justify-content:center;gap:calc(var(--u)*.7);
+  margin-top:calc(var(--u)*2.4);text-decoration:none;
+  font:700 calc(var(--u)*3)/1 'Sora',sans-serif;letter-spacing:-.01em;color:#fff;
+  padding:calc(var(--u)*1.8) calc(var(--u)*3.2);border-radius:99px;
+  background:linear-gradient(120deg,#12C0A6,#0A7F8C);
+  box-shadow:0 calc(var(--u)*.5) calc(var(--u)*1.8) rgba(10,127,140,.38);
+  animation:ctaPulse 3.4s ease-in-out infinite;
+}
+@keyframes ctaPulse{0%,100%{box-shadow:0 calc(var(--u)*.5) calc(var(--u)*1.8) rgba(10,127,140,.32),0 0 0 0 rgba(15,179,155,.35)}50%{box-shadow:0 calc(var(--u)*.7) calc(var(--u)*2.4) rgba(10,127,140,.42),0 0 0 calc(var(--u)*.7) rgba(15,179,155,0)}}
+.s5 .micro{margin-top:calc(var(--u)*1.3);max-width:78%}
+
+/* short screens */
+@media (max-height:700px){
+  .s1 .p-stage{height:calc(var(--u)*19)}
+  .s5 .p-stage{height:calc(var(--u)*13)}
+  .grid{gap:calc(var(--u)*.9)}
+  .card{padding:calc(var(--u)*1.2)}
+}
+
+/* reduced motion */
+.rm .blob,.rm .float,.rm .sheen,.rm .cta,.rm .pulse{animation:none !important}
+.rm .scene.is-active .anim,.rm .scene.is-active .a-fade,.rm .scene.is-active .a-left{animation-duration:.01ms !important;animation-delay:0s !important}
+.rm .scene.is-active .cam-s1,.rm .scene.is-active .cam-s2,.rm .scene.is-active .cam-s3,.rm .scene.is-active .cam-s4,.rm .scene.is-active .cam-s5{animation:none !important}
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="frame" id="frame">
+
+    <!-- ===== product asset (single source of truth, reused in every scene) ===== -->
+    <svg class="defs" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="gCase" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#F1F4F6"/><stop offset="1" stop-color="#DCE2E7"/>
+        </linearGradient>
+        <linearGradient id="gLid" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#E9EEF1"/>
+        </linearGradient>
+        <linearGradient id="gBud" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#EDF1F4"/><stop offset="1" stop-color="#D5DCE2"/>
+        </linearGradient>
+        <linearGradient id="gGrille" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#39424C"/><stop offset="1" stop-color="#12171C"/>
+        </linearGradient>
+        <linearGradient id="gSheen" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#ffffff" stop-opacity=".85"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+        </linearGradient>
+        <radialGradient id="gShadow" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stop-color="rgba(18,22,26,.34)"/><stop offset="1" stop-color="rgba(18,22,26,0)"/>
+        </radialGradient>
+        <radialGradient id="gGlow" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stop-color="rgba(15,179,155,.42)"/><stop offset="1" stop-color="rgba(15,179,155,0)"/>
+        </radialGradient>
+      </defs>
+    </svg>
+
+    <svg class="defs" aria-hidden="true" focusable="false">
+      <symbol id="prod" viewBox="0 0 400 400">
+        <ellipse cx="200" cy="356" rx="112" ry="20" fill="url(#gShadow)"/>
+        <ellipse cx="200" cy="352" rx="72" ry="11" fill="url(#gGlow)" opacity=".5"/>
+        <!-- charging case -->
+        <path d="M104 232 v-10 a54 54 0 0 1 54-54 h84 a54 54 0 0 1 54 54 v10 z" fill="url(#gLid)"/>
+        <rect x="100" y="230" width="200" height="116" rx="32" fill="url(#gCase)"/>
+        <path d="M104 233 h192" stroke="rgba(18,22,26,.13)" stroke-width="2" fill="none"/>
+        <path class="sheen" d="M104 232 v-10 a54 54 0 0 1 54-54 l-16 64 z" fill="url(#gSheen)" opacity=".45"/>
+        <circle cx="200" cy="262" r="4" fill="#12C0A6"/>
+        <circle cx="200" cy="262" r="9" fill="url(#gGlow)" opacity=".7"/>
+        <rect x="176" y="304" width="48" height="4" rx="2" fill="rgba(18,22,26,.12)"/>
+        <!-- earbuds (float above the case) -->
+        <g class="float">
+          <g transform="translate(147,124) rotate(-17)">
+            <rect x="-10" y="4" width="20" height="90" rx="10" fill="url(#gBud)"/>
+            <rect x="-6" y="14" width="4" height="62" rx="2" fill="rgba(255,255,255,.7)"/>
+            <ellipse cx="0" cy="-2" rx="30" ry="26" fill="url(#gBud)"/>
+            <ellipse cx="-1" cy="-1" rx="14" ry="12" fill="url(#gGrille)"/>
+            <ellipse cx="-1" cy="-1" rx="5" ry="4.2" fill="rgba(255,255,255,.3)"/>
+            <path d="M-26 -12 a30 26 0 0 1 24-14" stroke="rgba(255,255,255,.85)" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </g>
+          <g transform="translate(256,110) rotate(15)">
+            <rect x="-10" y="4" width="20" height="90" rx="10" fill="url(#gBud)"/>
+            <rect x="2" y="14" width="4" height="62" rx="2" fill="rgba(255,255,255,.7)"/>
+            <ellipse cx="0" cy="-2" rx="30" ry="26" fill="url(#gBud)"/>
+            <ellipse cx="1" cy="-1" rx="14" ry="12" fill="url(#gGrille)"/>
+            <ellipse cx="1" cy="-1" rx="5" ry="4.2" fill="rgba(255,255,255,.3)"/>
+            <path d="M26 -12 a30 26 0 0 0 -24-14" stroke="rgba(255,255,255,.85)" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </g>
+        </g>
+      </symbol>
+    </svg>
+
+    <!-- ===== ambient background ===== -->
+    <div class="bg" aria-hidden="true">
+      <div class="blob b1"></div>
+      <div class="blob b2"></div>
+      <div class="blob b3"></div>
+      <div class="bg-wash"></div>
+    </div>
+
+    <canvas class="fx" id="fx" aria-hidden="true"></canvas>
+
+    <!-- ===== progress bars (built once by JS) ===== -->
+    <div class="progress" id="progress" role="progressbar" aria-label="Reklama bosqichlari"></div>
+
+    <!-- ================= SCENE 1 — HOOK ================= -->
+    <section class="scene s1" id="s1" aria-label="1-bosqich">
+      <span class="eyebrow anim" style="--d:120ms" data-sfx="badge" data-sfx-delay="120" data-bind="category">SIMSIZ QULOQCHIN</span>
+      <div class="grow" style="justify-content:center">
+        <div class="p-stage cam cam-s1">
+          <span class="floor-glow"></span>
+          <svg class="prod" viewBox="0 0 400 400" role="img" aria-label="AeroPods Pro mahsuloti"><use href="#prod"/></svg>
+        </div>
+      </div>
+      <div>
+        <h1 class="h1 anim" style="--d:280ms" data-sfx="headline" data-sfx-delay="280" data-bind="productName">AeroPods Pro</h1>
+        <p class="lead anim" style="--d:520ms" data-sfx="subtext" data-sfx-delay="520" data-bind="heroText">Kundalik hayot uchun qulay va sodda simsiz audio.</p>
+      </div>
+    </section>
+
+    <!-- ================= SCENE 2 — BENEFITS ================= -->
+    <section class="scene s2" id="s2" aria-label="2-bosqich">
+      <span class="eyebrow anim" style="--d:100ms" data-sfx="badge" data-sfx-delay="100" data-bind="benefitsEyebrow">FOYDALARI</span>
+      <div class="head">
+        <h2 class="h2 anim" style="--d:220ms" data-sfx="headline" data-sfx-delay="220" data-bind="benefitsTitle">Nima uchun AeroPods Pro?</h2>
+      </div>
+      <div class="p-stage cam cam-s2" aria-hidden="true">
+        <span class="floor-glow"></span>
+        <svg class="prod" viewBox="0 0 400 400"><use href="#prod"/></svg>
+      </div>
+      <div class="grid" id="grid"></div>
+      <p class="foot-note a-fade" style="--d:1500ms">Umumiy foyda namunasi — aniq ma’lumotni CONFIG’dan kiriting.</p>
+    </section>
+
+    <!-- ================= SCENE 3 — EXPERIENCE ================= -->
+    <section class="scene s3" id="s3" aria-label="3-bosqich">
+      <span class="eyebrow anim" style="--d:100ms" data-sfx="badge" data-sfx-delay="100" data-bind="experienceEyebrow">TAJRIBA</span>
+      <div class="stage-wrap">
+        <div class="p-stage cam cam-s3" aria-hidden="true">
+          <span class="floor-glow"></span>
+          <svg class="prod" viewBox="0 0 400 400"><use href="#prod"/></svg>
+        </div>
+        <span class="veil"></span>
+        <div class="quote">
+          <span class="rule a-fade" style="--d:240ms"></span>
+          <h2 class="q anim" style="--d:340ms" data-sfx="headline" data-sfx-delay="340" data-bind="experienceText">Kun oxirida qoladigan narsa — musiqa.</h2>
+          <p class="lead anim" style="--d:600ms" data-sfx="subtext" data-sfx-delay="600" data-bind="experienceSub">Shovqinli kun tugaydi, tinglash esa davom etadi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SCENE 4 — OFFER ================= -->
+    <section class="scene s4" id="s4" aria-label="4-bosqich">
+      <div class="grow" style="position:relative">
+        <div class="p-stage cam cam-s4" aria-hidden="true">
+          <span class="floor-glow"></span>
+          <svg class="prod" viewBox="0 0 400 400"><use href="#prod"/></svg>
+        </div>
+        <span class="veil"></span>
+        <div class="body">
+          <span class="eyebrow anim" style="--d:100ms" data-sfx="badge" data-sfx-delay="100" data-bind="offerEyebrow">TAKLIF</span>
+          <h2 class="h2 anim" style="--d:220ms" data-sfx="headline" data-sfx-delay="220" data-bind="offerTitle">AeroPods Pro</h2>
+          <div id="priceSlot"></div>
+          <ul class="offer-list" id="offerList"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SCENE 5 — CTA ================= -->
+    <section class="scene s5" id="s5" aria-label="5-bosqich">
+      <span class="eyebrow anim" style="--d:120ms" data-sfx="badge" data-sfx-delay="120" data-bind="ctaEyebrow">BUYURTMA</span>
+      <div class="grow" style="justify-content:center;align-items:center">
+        <div class="p-stage cam cam-s5">
+          <span class="floor-glow"></span>
+          <svg class="prod" viewBox="0 0 400 400" role="img" aria-label="AeroPods Pro mahsuloti"><use href="#prod"/></svg>
+        </div>
+      </div>
+      <div>
+        <h1 class="h1 anim" style="--d:260ms" data-sfx="headline" data-sfx-delay="260" data-bind="productName">AeroPods Pro</h1>
+        <p class="lead anim" style="--d:480ms" data-sfx="subtext" data-sfx-delay="480" data-bind="ctaSub">Siz tanlagan narsa — endi sizning qo‘lingizda.</p>
+        <a class="cta anim" id="cta" href="#" target="_blank" rel="noopener"
+           style="--d:760ms" data-sfx="cta" data-sfx-delay="760" data-bind="ctaText">Telegram orqali buyurtma berish</a>
+        <p class="micro anim" style="--d:1000ms" data-sfx="subtext" data-sfx-delay="1000" data-bind="ctaSupport">Savol va buyurtma uchun biz bilan bog‘laning.</p>
+      </div>
+    </section>
+
+    <!-- ================= SOUND ================= -->
+    <button class="sound" id="sound" type="button" data-state="on" aria-label="Ovozni o‘chirish" aria-pressed="true">
+      <svg class="i-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+      </svg>
+      <svg class="i-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 5 6"/><path d="m21 9-5 6"/>
+      </svg>
+    </button>
+
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   CONFIG — bu yerdagi qiymatlarni o‘zgartiring (faqat shu obyekt)
+   price  -> bo‘sh qoldirilsa, 4-bosqichda "Narxni kiriting" maydoni chiqadi
+   ctaUrl -> havolasi (bo‘sh bo‘lsa # ishlatiladi)
+   ========================================================================== */
+const CONFIG = {
+  productName: 'AeroPods Pro',
+  category: 'SIMSIZ QULOQCHIN',
+  heroText: 'Kundalik hayot uchun qulay va sodda simsiz audio.',
+
+  price: '',            // masalan: '299 000'
+  currency: 'so‘m',
+
+  benefitsEyebrow: 'FOYDALARI',
+  benefitsTitle: 'Nima uchun AeroPods Pro?',
+  features: [           // umumiy foyda namunalari — o‘z ma’lumotingiz bilan almashtiring
+    { t: 'Toza ovoz',   d: 'Kundalik tinglash uchun yumshoq va aniq balans.' },
+    { t: 'Uzluksiz ish', d: 'Kun davomida musiqani uzib tushirmasdan tinglang.' },
+    { t: 'Qulay taqish',d: 'Yengil dizayn — kunning butun davomida.' },
+    { t: 'Barqaror aloqa', d: 'Telefon bilan uzluksiz va ishonchli bog‘lanish.' }
+  ],
+
+  experienceEyebrow: 'TAJRIBA',
+  experienceText: 'Kun oxirida qoladigan narsa — musiqa.',
+  experienceSub: 'Shovqinli kun tugaydi, tinglash esa davom etadi.',
+
+  offerEyebrow: 'TAKLIF',
+  offerTitle: 'AeroPods Pro',
+  offerHeader: 'Tarkibiga kiradi:',
+  offerItems: [         // bo‘sh qoldirilganlar "to‘ldirish uchun" maydoni sifatida chiqadi
+    { t: 'AeroPods Pro', ph: true },
+    { t: 'Kerakli aksessuarlar', ph: true },
+    { t: 'Qo‘llab-quvvatlash', ph: true }
+  ],
+
+  ctaEyebrow: 'BUYURTMA',
+  ctaSub: 'Siz tanlagan narsa — endi sizning qo‘lingizda.',
+  ctaText: 'Telegram orqali buyurtma berish',
+  ctaUrl: '#',           // havolani shu yerga yozing
+  ctaSupport: 'Savol va buyurtma uchun biz bilan bog‘laning.',
+
+  durations: [4000, 4000, 4000, 4000, 4000],  // ms, har sahifa
+  loop: true,
+  audio: { music: 0.30, sfx: 0.55, master: 0.9 }
+};
+
+/* ============================== helpers ============================== */
+const $  = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.prototype.slice.call((r || document).querySelectorAll(s));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const frame = $('#frame');
+
+/* ---- config → DOM ---- */
+function path(o, p){ return p.split('.').reduce((a, k) => (a == null ? a : a[k]), o); }
+$$('[data-bind]').forEach(el => {
+  const v = path(CONFIG, el.dataset.bind);
+  if (typeof v === 'string' && v) el.textContent = v;
+});
+if (CONFIG.ctaUrl) $('#cta').href = CONFIG.ctaUrl;
+
+const grid = $('#grid');
+CONFIG.features.forEach((f, i) => {
+  const d = 620 + i * 190;
+  const card = document.createElement('div');
+  card.className = 'card anim';
+  card.style.setProperty('--d', d + 'ms');
+  card.setAttribute('data-sfx', 'feature');
+  card.setAttribute('data-sfx-delay', String(d));
+  card.innerHTML = '<span class="n">0' + (i + 1) + '</span><span class="t"></span><span class="d"></span>';
+  $('.t', card).textContent = f.t;
+  $('.d', card).textContent = f.d;
+  grid.appendChild(card);
+});
+
+const priceSlot = $('#priceSlot');
+if (CONFIG.price) {
+  const wrap = document.createElement('div');
+  wrap.className = 'price pulse';
+  wrap.setAttribute('data-sfx', 'price');
+  wrap.setAttribute('data-sfx-delay', '420');
+  wrap.innerHTML = '<span class="num"></span><span class="cur"></span>';
+  $('.num', wrap).textContent = CONFIG.price;
+  $('.cur', wrap).textContent = CONFIG.currency;
+  priceSlot.appendChild(wrap);
+} else {
+  const slot = document.createElement('div');
+  slot.className = 'price-slot anim';
+  slot.style.setProperty('--d', '420ms');
+  slot.setAttribute('data-sfx', 'price');
+  slot.setAttribute('data-sfx-delay', '420');
+  slot.textContent = 'Narxni kiriting';
+  priceSlot.appendChild(slot);
+}
+
+const offerList = $('#offerList');
+const oh = document.createElement('li');
+oh.className = 'micro';
+oh.style.gap = '0';
+oh.setAttribute('data-sfx', 'badge');
+oh.setAttribute('data-sfx-delay', '700');
+oh.textContent = CONFIG.offerHeader;
+offerList.appendChild(oh);
+CONFIG.offerItems.forEach((it, i) => {
+  const d = 820 + i * 170;
+  const li = document.createElement('li');
+  li.className = 'anim' + (it.ph ? ' ph' : '');
+  li.style.setProperty('--d', d + 'ms');
+  li.setAttribute('data-sfx', 'feature');
+  li.setAttribute('data-sfx-delay', String(d));
+  li.innerHTML = '<span class="tick">✓</span><span class="txt"></span>';
+  $('.txt', li).textContent = it.t;
+  offerList.appendChild(li);
+});
+
+/* ============================== timeline ============================== */
+const DUR   = CONFIG.durations.slice();
+const TOTAL = DUR.reduce((a, b) => a + b, 0);
+const scenes = $$('.scene');
+
+const progress = $('#progress');
+const bars = DUR.map(() => {
+  const bar = document.createElement('div');
+  bar.className = 'bar';
+  const fill = document.createElement('div');
+  fill.className = 'bar-fill';
+  bar.appendChild(fill);
+  progress.appendChild(bar);
+  return fill;
+});
+scenes.forEach((s, i) => s.style.setProperty('--cd', DUR[i] + 'ms'));
+
+/* precomputed, deterministic SFX schedule (used by preview + export) */
+const SCHEDULE = [];
+DUR.forEach((d, i) => {
+  const start = DUR.slice(0, i).reduce((a, b) => a + b, 0);
+  SCHEDULE.push({ t: start, kind: 'scene', scene: i });
+  $$('[data-sfx]', scenes[i]).forEach(el => {
+    SCHEDULE.push({ t: start + (Number(el.dataset.sfxDelay) || 0), kind: 'text', type: el.dataset.sfx, scene: i });
+  });
+});
+SCHEDULE.sort((a, b) => a.t - b.t);
+
+/* ============================== audio ============================== */
+const A = {
+  ctx: null, ready: false, muted: false, timers: [], sched: null,
+  step: 0, nextTime: 0, noise: null, detune: 0,
+
+  unlock() {
+    if (!this.ready) this.init();
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  },
+
+  init() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    const ctx = this.ctx = new AC();
+    this.master = ctx.createGain(); this.master.gain.value = 0.0001;
+    this.lp = ctx.createBiquadFilter();
+    this.lp.type = 'lowpass'; this.lp.frequency.value = 7200; this.lp.Q.value = .6;
+    this.comp = ctx.createDynamicsCompressor();
+    this.comp.threshold.value = -18; this.comp.knee.value = 22; this.comp.ratio.value = 4;
+    this.comp.attack.value = .005; this.comp.release.value = .22;
+    this.master.connect(this.lp); this.lp.connect(this.comp); this.comp.connect(ctx.destination);
+
+    this.musicBus = ctx.createGain(); this.musicBus.gain.value = CONFIG.audio.music; this.musicBus.connect(this.master);
+    this.sfxBus = ctx.createGain(); this.sfxBus.gain.value = CONFIG.audio.sfx; this.sfxBus.connect(this.master);
+
+    this.conv = ctx.createConvolver(); this.conv.buffer = this.makeIR(1.25, 2.8);
+    this.convGain = ctx.createGain(); this.convGain.gain.value = .5;
+    this.conv.connect(this.convGain); this.convGain.connect(this.master);
+    this.send = ctx.createGain(); this.send.gain.value = .55; this.send.connect(this.conv);
+
+    const len = Math.floor(ctx.sampleRate * .6);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    this.noise = buf;
+
+    this.ready = true;
+    this.master.gain.setTargetAtTime(this.muted ? 0.0001 : CONFIG.audio.master, ctx.currentTime, .4);
+    this.startMusic();
+  },
+
+  makeIR(sec, decay) {
+    const ctx = this.ctx, n = Math.floor(ctx.sampleRate * sec);
+    const buf = ctx.createBuffer(2, n, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) {
+      const ch = buf.getChannelData(c);
+      for (let i = 0; i < n; i++) ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, decay);
+    }
+    return buf;
+  },
+
+  tone(o) {
+    if (!this.ready || this.muted) return;
+    const ctx = this.ctx, t0 = o.at != null ? o.at : ctx.currentTime;
+    const dur = o.dur || .12;
+    const osc = ctx.createOscillator();
+    osc.type = o.type || 'sine';
+    osc.frequency.setValueAtTime(o.f, t0);
+    if (o.f2) osc.frequency.exponentialRampToValueAtTime(Math.max(30, o.f2), t0 + dur);
+    osc.detune.value = o.detune || 0;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(o.gain || .2, t0 + Math.min(.014, dur * .25));
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(g); g.connect(this.sfxBus);
+    if (o.send !== 0) { const s = ctx.createGain(); s.gain.value = o.send == null ? .5 : o.send; g.connect(s); s.connect(this.conv); }
+    osc.start(t0); osc.stop(t0 + dur + .04);
+  },
+
+  tick(o) {
+    if (!this.ready || this.muted) return;
+    const ctx = this.ctx, t0 = o.at != null ? o.at : ctx.currentTime;
+    const dur = o.dur || .05;
+    const src = ctx.createBufferSource(); src.buffer = this.noise;
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass'; bp.frequency.value = o.freq || 2600; bp.Q.value = o.q || 1.4;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(o.gain || .2, t0 + .006);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    src.connect(bp); bp.connect(g); g.connect(this.sfxBus);
+    if (o.send !== 0) { const s = ctx.createGain(); s.gain.value = o.send == null ? .3 : o.send; g.connect(s); s.connect(this.conv); }
+    src.start(t0); src.stop(t0 + dur + .03);
+  },
+
+  /* ---- text reveal SFX ---- */
+  text(type) {
+    this.detune = (this.detune + 7) % 23;
+    const dt = (this.detune - 11) * 3.2;
+    const now = this.ctx ? this.ctx.currentTime : 0;
+    switch (type) {
+      case 'headline': this.tone({ f: 330, f2: 296, dur: .16, gain: .30, type: 'triangle', detune: dt, send: .5 }); this.tick({ freq: 1900, dur: .05, gain: .10, send: .3 }); break;
+      case 'subtext':  this.tone({ f: 1180, f2: 1040, dur: .07, gain: .13, detune: dt, send: .35 }); break;
+      case 'badge':    this.tone({ f: 980, f2: 1320, dur: .09, gain: .14, detune: dt, send: .4 }); break;
+      case 'price':    this.tone({ f: 660, dur: .13, gain: .24, type: 'triangle', detune: dt }); this.tone({ f: 990, dur: .22, gain: .20, type: 'triangle', at: now + .10, detune: dt, send: .6 }); break;
+      case 'feature':  this.tone({ f: 1520 + (this.detune % 4) * 45, f2: 1200, dur: .055, gain: .11, detune: dt, send: .3 }); break;
+      case 'cta':      this.tone({ f: 440, dur: .34, gain: .20, type: 'triangle', send: .6 }); this.tone({ f: 660, dur: .34, gain: .16, type: 'sine', detune: dt, send: .6 }); this.tone({ f: 880, dur: .40, gain: .11, type: 'sine', detune: dt, send: .7 }); break;
+      default:         this.tone({ f: 900, dur: .06, gain: .12, detune: dt });
+    }
+  },
+
+  /* ---- page transition SFX (one per scene, distinct but related) ---- */
+  scene(i) {
+    const now = this.ctx ? this.ctx.currentTime : 0, dt = (i % 3 - 1) * 4;
+    switch (i) {
+      case 0: [523.25, 659.25, 783.99].forEach((f, k) => this.tone({ f, dur: .28, gain: .16, type: 'triangle', at: now + k * .11, send: .6, detune: dt })); break;
+      case 1: this.tone({ f: 392, f2: 587.33, dur: .30, gain: .17, type: 'triangle', send: .5, detune: dt }); break;
+      case 2: this.tone({ f: 880, dur: .16, gain: .14, type: 'sine', send: .35, detune: dt }); this.tone({ f: 1320, dur: .12, gain: .08, type: 'sine', at: now + .07, send: .35 }); break;
+      case 3: this.tone({ f: 329.63, f2: 493.88, dur: .34, gain: .16, type: 'sine', send: .6, detune: dt }); break;
+      default: [440, 554.37, 659.25].forEach((f, k) => this.tone({ f, dur: .34, gain: .15, type: 'triangle', at: now + k * .09, send: .6, detune: dt }));
+    }
+    this.tick({ freq: 900 + i * 260, dur: .28, gain: .05, q: .7, send: .5 }); // soft whoosh
+  },
+
+  /* ---- ambient bed with look-ahead scheduler ---- */
+  chords: [
+    [110.00, 138.59, 164.81, 196.00],  // Amaj7
+    [ 92.50, 110.00, 138.59, 164.81],  // F#m7
+    [ 73.42,  92.50, 110.00, 138.59],  // Dmaj7
+    [ 82.41, 103.83, 123.47, 146.83]   // E
+  ],
+  melody: [440, 523.25, 587.33, 659.25, 783.99],
+  STEP: .5, LOOKAHEAD: .8,
+
+  startMusic() {
+    if (!this.ready || this.sched) return;
+    this.step = 0;
+    this.nextTime = this.ctx.currentTime + .1;
+    this.sched = setInterval(() => this.pump(), 200);
+    this.pump();
+  },
+  pump() {
+    if (!this.ready || this.ctx.state !== 'running') return;
+    const now = this.ctx.currentTime;
+    while (this.nextTime < now + this.LOOKAHEAD) { this.playStep(this.step, this.nextTime); this.nextTime += this.STEP; this.step++; }
+  },
+  playStep(step, at) {
+    const ctx = this.ctx, ci = Math.floor(step / 16) % 4, pos = step % 16;
+    const chord = this.chords[ci];
+    if (pos === 0) {
+      chord.forEach((f, k) => {
+        const o = ctx.createOscillator(); o.type = 'triangle'; o.frequency.value = f * 2;
+        const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, at);
+        g.gain.linearRampToValueAtTime(.028 - k * .004, at + 1.6);
+        g.gain.linearRampToValueAtTime(0.0001, at + 7.6);
+        o.connect(g); g.connect(this.musicBus); o.start(at); o.stop(at + 7.7);
+      });
+      const b = ctx.createOscillator(); b.type = 'sine'; b.frequency.value = chord[0] / 2;
+      const bg = ctx.createGain(); bg.gain.setValueAtTime(0.0001, at);
+      bg.gain.linearRampToValueAtTime(.075, at + .5); bg.gain.linearRampToValueAtTime(0.0001, at + 3.4);
+      b.connect(bg); bg.connect(this.musicBus); b.start(at); b.stop(at + 3.5);
+    }
+    if (pos === 6 || pos === 11 || (ci === 3 && pos === 14)) {
+      const f = this.melody[(step * 3) % this.melody.length];
+      const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, at);
+      g.gain.linearRampToValueAtTime(.030, at + .04);
+      g.gain.linearRampToValueAtTime(0.0001, at + 1.1);
+      o.connect(g); g.connect(this.musicBus); o.start(at); o.stop(at + 1.2);
+    }
+  },
+
+  setMuted(m) {
+    this.muted = m;
+    if (this.ready) this.master.gain.setTargetAtTime(m ? 0.0001 : CONFIG.audio.master, this.ctx.currentTime, .12);
+    if (m) this.clearTimers();
+  },
+  clearTimers() { this.timers.forEach(clearTimeout); this.timers = []; },
+
+  cleanup() {
+    this.clearTimers();
+    if (this.sched) { clearInterval(this.sched); this.sched = null; }
+    if (this.ready) {
+      try { this.master.gain.setTargetAtTime(0.0001, this.ctx.currentTime, .1); } catch (e) {}
+      setTimeout(() => { try { this.ctx.close(); } catch (e) {} }, 260);
+    }
+  }
+};
+
+/* ============================== scene engine ============================== */
+let current = -1, timers = [], t0 = 0, raf = 0, playing = true;
+
+function setProgress(i, p) {
+  for (let k = 0; k < bars.length; k++) {
+    bars[k].style.transform = 'scaleX(' + (k < i ? 1 : (k === i ? clamp(p, 0, 1) : 0)) + ')';
+  }
+}
+
+function enterScene(i) {
+  timers.forEach(clearTimeout); timers = [];
+  scenes.forEach(s => s.classList.remove('is-active'));
+  void frame.offsetWidth;                       /* reflow → animations restart */
+  scenes[i].classList.add('is-active');
+  current = i;
+  setProgress(i, 0);
+  if (A.ready && !A.muted) A.scene(i);
+  $$('[data-sfx]', scenes[i]).forEach(el => {
+    const d = Number(el.dataset.sfxDelay) || 0;
+    timers.push(setTimeout(() => { if (current === i && A.ready && !A.muted) A.text(el.dataset.sfx); }, d));
+  });
+}
+
+/* deterministic render: same visual state for any timestamp (preview & export) */
+function renderAt(t) {
+  const time = clamp(t, 0, TOTAL - .001);
+  let acc = 0, i = DUR.length - 1, local = 0;
+  for (let k = 0; k < DUR.length; k++) {
+    if (time < acc + DUR[k]) { i = k; local = time - acc; break; }
+    acc += DUR[k];
+  }
+  if (i !== current) enterScene(i);
+  setProgress(i, local / DUR[i]);
+}
+
+function tick(now) {
+  if (!playing) return;
+  if (!t0) t0 = now;
+  let t = now - t0;
+  if (t >= TOTAL) {
+    if (CONFIG.loop) { t0 = now - (t % TOTAL); t = t % TOTAL; }
+    else { renderAt(TOTAL - .001); return; }
+  }
+  renderAt(t);
+  raf = requestAnimationFrame(tick);
+}
+
+/* ============================== canvas particles ============================== */
+const cv = $('#fx'), cx = cv.getContext('2d');
+let parts = [], dpr = 1;
+function sizeCanvas() {
+  const r = frame.getBoundingClientRect();
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  cv.width = Math.max(1, Math.round(r.width * dpr));
+  cv.height = Math.max(1, Math.round(r.height * dpr));
+  const n = RM ? 0 : 26;
+  parts = [];
+  for (let i = 0; i < n; i++) {
+    parts.push({
+      x: Math.random(), y: Math.random(),
+      s: (0.6 + Math.random() * 1.9) * dpr,
+      v: 0.00004 + Math.random() * 0.00011,
+      a: 0.10 + Math.random() * 0.22,
+      c: Math.random() < 0.62 ? '15,179,155' : '18,22,26'
+    });
+  }
+}
+function drawParts() {
+  cx.clearRect(0, 0, cv.width, cv.height);
+  for (const p of parts) {
+    p.y -= p.v;
+    if (p.y < -0.05) { p.y = 1.05; p.x = Math.random(); }
+    cx.beginPath();
+    cx.fillStyle = 'rgba(' + p.c + ',' + p.a + ')';
+    cx.arc(p.x * cv.width, p.y * cv.height, p.s, 0, 6.2832);
+    cx.fill();
+  }
+}
+if (!RM) { sizeCanvas(); (function loop(){ drawParts(); requestAnimationFrame(loop); })(); }
+else { sizeCanvas(); drawParts(); }
+let rz;
+window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(sizeCanvas, 150); });
+
+/* ============================== sound control ============================== */
+const soundBtn = $('#sound');
+let everUnlocked = false;
+function firstInteraction() {
+  if (everUnlocked) return;
+  everUnlocked = true;
+  A.unlock();                                   /* audio ON ni saqlab, initialize qiladi */
+  document.removeEventListener('pointerdown', firstInteraction);
+  document.removeEventListener('keydown', firstInteraction);
+}
+document.addEventListener('pointerdown', firstInteraction);
+document.addEventListener('keydown', firstInteraction);
+
+soundBtn.addEventListener('click', () => {
+  if (!everUnlocked) { firstInteraction(); return; }   /* birinchi bosish — ovozni o‘chirmaydi */
+  A.unlock();
+  A.setMuted(!A.muted);
+  soundBtn.dataset.state = A.muted ? 'off' : 'on';
+  soundBtn.setAttribute('aria-pressed', String(!A.muted));
+  soundBtn.setAttribute('aria-label', A.muted ? 'Ovozni yoqish' : 'Ovozni o‘chirish');
+  if (!A.muted && current >= 0) A.scene(current);
+});
+
+/* ============================== reduced motion / cleanup ============================== */
+if (RM) frame.classList.add('rm');
+window.addEventListener('pagehide', () => {
+  timers.forEach(clearTimeout); timers = [];
+  cancelAnimationFrame(raf);
+  A.cleanup();
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { A.clearTimers(); if (A.ready) A.master.gain.setTargetAtTime(0.0001, A.ctx.currentTime, .1); }
+  else if (!A.muted && A.ready) A.master.gain.setTargetAtTime(CONFIG.audio.master, A.ctx.currentTime, .2);
+});
+
+/* export hooks (deterministic MP4 capture) */
+window.__AD_TOTAL = TOTAL;
+window.__AD_SFX = SCHEDULE;
+window.__AD_RENDER_AT = function (ms) { playing = false; cancelAnimationFrame(raf); renderAt(ms); };
+window.__AD_PLAY = function () { if (playing) return; playing = true; t0 = 0; raf = requestAnimationFrame(tick); };
+
+/* start: first scene visible immediately */
+renderAt(0);
+raf = requestAnimationFrame(tick);
+</script>
+</body>
+</html>
