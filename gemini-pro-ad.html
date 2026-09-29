@@ -1,838 +1,815 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Gemini Pro — 18 oylik obuna</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Gemini Pro — 18 oy · 20 000 so'm</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --ink:#171a20;
-    --ink-soft:#5a6270;
-    --ink-faint:#8b93a1;
-    --bg:#f6f7fb;
-    --card:#ffffff;
-    --line:rgba(23,26,32,.08);
-    --accent:#4353e8;
-    --accent-2:#9333ea;
-    --accent-3:#ec4899;
-    --accent-grad:linear-gradient(135deg,#4353e8 0%,#9333ea 55%,#ec4899 100%);
-    --accent-soft:rgba(67,83,232,.10);
-    --accent-soft-2:rgba(147,51,234,.08);
-    --shadow-card:0 10px 30px rgba(23,26,32,.07),0 2px 6px rgba(23,26,32,.04);
-    --shadow-hero:0 30px 60px rgba(67,83,232,.18),0 12px 24px rgba(23,26,32,.08);
-    --radius:20px;
-    --scene-dur:4000ms;
-  }
-  *{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    font-family:'Inter',system-ui,-apple-system,sans-serif;
-    background:#0b0d12;
-    display:flex;align-items:center;justify-content:center;
-    min-height:100vh;overflow:hidden;
-    color:var(--ink);
-    -webkit-font-smoothing:antialiased;
-  }
+/* ============ EDITABLE DESIGN TOKENS (product-derived palette) ============ */
+:root{
+  --u: 4.3px;                      /* 1 unit = 1% of frame width (set by JS) */
+  --bg:#f4f6fc;
+  --ink:#0f1730;
+  --ink-soft:#4d5a7d;
+  --accent:#4285f4;                /* product brand blue  */
+  --accent-2:#8b5cf6;              /* violet accent        */
+  --accent-3:#ec4899;              /* soft pink accent     */
+  --line:rgba(15,23,48,.09);
+  --card:rgba(255,255,255,.86);
+  --shadow:0 18px 40px -22px rgba(15,23,48,.35);
+  --shadow-soft:0 10px 26px -18px rgba(15,23,48,.30);
+  --ease:cubic-bezier(.22,.8,.24,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:#0d1226;
+  background-image:
+    radial-gradient(900px 600px at 20% 0%, rgba(66,133,244,.22), transparent 60%),
+    radial-gradient(800px 700px at 85% 100%, rgba(139,92,246,.20), transparent 62%);
+  font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color:#e8ecf8;
+  display:grid;place-items:center;
+  padding:12px;
+  overflow:hidden;
+}
+.stage{display:flex;align-items:center;justify-content:center;width:100%}
 
-  /* ---------- 9:16 FRAME ---------- */
-  .frame{
-    position:relative;
-    width:100%;
-    max-width:430px;
-    aspect-ratio:9/16;
-    max-height:calc(100dvh - 24px);
-    background:var(--bg);
-    overflow:hidden;
-    border-radius:28px;
-    box-shadow:0 40px 90px rgba(0,0,0,.55);
-  }
-  @media (min-width:520px){ .frame{border-radius:36px} }
+/* ============ FRAME ============ */
+.frame{
+  position:relative;
+  width:min(430px, calc(100vw - 24px), calc((100vh - 24px) * 0.5625));
+  aspect-ratio:9/16;
+  overflow:hidden;
+  border-radius:calc(var(--u)*6);
+  background:var(--bg);
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.06);
+  isolation:isolate;
+}
+@supports (height:1svh){
+  .frame{width:min(430px, calc(100vw - 24px), calc((100svh - 24px) * 0.5625))}
+}
 
-  /* ---------- BACKGROUND LAYERS ---------- */
-  .bg{position:absolute;inset:0;z-index:0;overflow:hidden}
-  .blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;will-change:transform}
-  .blob-1{width:340px;height:340px;background:radial-gradient(circle at 30% 30%,#c7d2fe,transparent 70%);top:-90px;left:-80px;animation:blobDrift1 16s ease-in-out infinite alternate}
-  .blob-2{width:380px;height:380px;background:radial-gradient(circle at 60% 40%,#e9d5ff,transparent 70%);bottom:-120px;right:-100px;animation:blobDrift2 19s ease-in-out infinite alternate}
-  .blob-3{width:260px;height:260px;background:radial-gradient(circle at 50% 50%,#fbcfe8,transparent 70%);top:40%;left:55%;opacity:.35;animation:blobDrift3 22s ease-in-out infinite alternate}
-  @keyframes blobDrift1{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(40px,30px,0) scale(1.08)}}
-  @keyframes blobDrift2{from{transform:translate3d(0,0,0) scale(1.05)}to{transform:translate3d(-50px,-35px,0) scale(.95)}}
-  @keyframes blobDrift3{from{transform:translate3d(0,0,0)}to{transform:translate3d(-30px,40px,0)}}
+/* ============ BACKGROUND LAYERS ============ */
+.bg{position:absolute;inset:0;z-index:0;overflow:hidden;background:
+   radial-gradient(120% 80% at 50% -10%, #ffffff 0%, var(--bg) 55%, #eaeefb 100%)}
+.blob{position:absolute;border-radius:50%;filter:blur(calc(var(--u)*7));opacity:.55;will-change:transform}
+.b1{width:62%;padding-bottom:62%;left:-16%;top:-8%;background:radial-gradient(circle at 35% 35%, rgba(66,133,244,.55), rgba(66,133,244,0) 70%);animation:drift1 22s ease-in-out infinite alternate}
+.b2{width:58%;padding-bottom:58%;right:-18%;top:24%;background:radial-gradient(circle at 60% 40%, rgba(139,92,246,.45), rgba(139,92,246,0) 70%);animation:drift2 27s ease-in-out infinite alternate}
+.b3{width:52%;padding-bottom:52%;left:8%;bottom:-14%;background:radial-gradient(circle at 50% 50%, rgba(236,72,153,.30), rgba(236,72,153,0) 70%);animation:drift3 31s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate3d(18%,12%,0) scale(1.12)}}
+@keyframes drift2{to{transform:translate3d(-16%,-10%,0) scale(1.08)}}
+@keyframes drift3{to{transform:translate3d(12%,-14%,0) scale(1.15)}}
+.grain{position:absolute;inset:0;opacity:.16;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E")}
+.vignette{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(78% 62% at 50% 46%, rgba(0,0,0,0) 55%, rgba(16,22,48,.13) 100%)}
+canvas#fx{position:absolute;inset:0;z-index:1;pointer-events:none}
 
-  .grain{
-    position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.05;
-    background-image:radial-gradient(rgba(23,26,32,.5) .5px,transparent .5px);
-    background-size:3px 3px;mix-blend-mode:multiply;
-  }
-  .vignette{
-    position:absolute;inset:0;z-index:40;pointer-events:none;
-    background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(23,26,32,.10) 100%);
-  }
-  #particles{position:absolute;inset:0;z-index:2;pointer-events:none}
+/* ============ UI CHROME ============ */
+.ui{position:absolute;inset:0;z-index:4;pointer-events:none}
+.progress{position:absolute;top:calc(env(safe-area-inset-top,0px) + var(--u)*2.4);left:calc(var(--u)*4);right:calc(var(--u)*4);
+  display:flex;gap:calc(var(--u)*1.4);z-index:6}
+.progress i{flex:1;height:calc(var(--u)*.9);border-radius:99px;background:rgba(15,23,48,.12);overflow:hidden;position:relative}
+.progress i b{position:absolute;inset:0;display:block;border-radius:99px;transform:scaleX(0);transform-origin:left center;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+.sound{position:absolute;top:calc(env(safe-area-inset-top,0px) + var(--u)*6.2);right:calc(var(--u)*4);z-index:7;
+  width:calc(var(--u)*9);height:calc(var(--u)*9);border-radius:50%;pointer-events:auto;cursor:pointer;
+  display:grid;place-items:center;border:1px solid var(--line);background:rgba(255,255,255,.72);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:var(--shadow-soft);color:var(--ink);
+  transition:transform .18s var(--ease), background .2s}
+.sound:active{transform:scale(.94)}
+.sound svg{width:52%;height:52%;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.sound .muted-ico{display:none}
+.sound.is-muted .wave-ico{display:none}
+.sound.is-muted .muted-ico{display:block}
 
-  /* ---------- PROGRESS BARS ---------- */
-  .progress{position:absolute;top:0;left:0;right:0;z-index:60;display:flex;gap:6px;padding:14px 16px 0}
-  .progress .bar{flex:1;height:3px;border-radius:99px;background:rgba(23,26,32,.10);overflow:hidden}
-  .progress .bar .fill{height:100%;width:0;background:var(--accent-grad);border-radius:99px}
-  .progress .bar.done .fill{width:100%}
+/* ============ SCENES ============ */
+.scene{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top,0px) + var(--u)*13) calc(var(--u)*6)
+          calc(env(safe-area-inset-bottom,0px) + var(--u)*7);
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .5s var(--ease), visibility 0s linear .5s}
+.scene.is-active{opacity:1;visibility:visible;transition:opacity .55s var(--ease), visibility 0s}
+.cam{position:absolute;inset:0;will-change:transform}
+.scene-inner{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:center;gap:calc(var(--u)*2.6)}
+.center{text-align:center;align-items:center}
 
-  /* ---------- SOUND BUTTON ---------- */
-  .sound-btn{
-    position:absolute;top:26px;right:14px;z-index:70;
-    width:40px;height:40px;border-radius:50%;
-    border:1px solid var(--line);background:rgba(255,255,255,.85);
-    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
-    display:flex;align-items:center;justify-content:center;cursor:pointer;
-    color:var(--ink);box-shadow:var(--shadow-card);
-    transition:transform .15s ease;
-  }
-  .sound-btn:active{transform:scale(.94)}
-  .sound-btn svg{width:19px;height:19px}
+/* entrance animations */
+.scene.is-active [data-anim]{animation:rise .95s var(--ease) var(--d,0ms) both}
+.scene.is-active .cam{animation:camIn var(--cam-dur,4s) var(--ease) var(--cam-delay,0ms) both}
+@keyframes rise{from{opacity:0;transform:translate3d(0,calc(var(--u)*3.4),0)}to{opacity:1;transform:none}}
+@keyframes camIn{from{opacity:.35;transform:scale(var(--cam-from,1.06)) translate3d(0,calc(var(--u)*.8),0)}to{opacity:1;transform:scale(1) translate3d(0,0,0)}}
 
-  /* ---------- SCENES ---------- */
-  .scene{
-    position:absolute;inset:0;z-index:10;
-    opacity:0;visibility:hidden;pointer-events:none;
-    transition:opacity .6s ease,visibility 0s linear .6s;
-    display:flex;flex-direction:column;
-    padding:64px 26px 34px;
-  }
-  .scene.active{
-    opacity:1;visibility:visible;pointer-events:auto;
-    transition:opacity .6s ease,visibility 0s linear 0s;
-  }
-  .scene-inner{position:relative;z-index:10;height:100%;display:flex;flex-direction:column}
+/* ============ TYPE ============ */
+.kicker{display:inline-flex;align-items:center;gap:calc(var(--u)*1.2);align-self:center;
+  padding:calc(var(--u)*1.2) calc(var(--u)*3);border-radius:99px;
+  font-size:calc(var(--u)*2.7);font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--accent);background:rgba(66,133,244,.10);border:1px solid rgba(66,133,244,.22)}
+.title{font-family:'Sora',sans-serif;font-weight:800;letter-spacing:-.035em;line-height:.98;
+  font-size:calc(var(--u)*13.4);color:var(--ink)}
+.s-title{font-family:'Sora',sans-serif;font-weight:700;letter-spacing:-.028em;line-height:1.06;
+  font-size:calc(var(--u)*8.4);color:var(--ink)}
+.grad{background:linear-gradient(100deg,var(--accent) 0%,var(--accent-2) 52%,var(--accent-3) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;background-color:var(--accent)}
+.lede{font-size:calc(var(--u)*3.7);line-height:1.5;color:var(--ink-soft);max-width:78%;font-weight:500}
+.note{font-size:calc(var(--u)*2.6);color:rgba(77,90,125,.75);line-height:1.45}
 
-  /* reveal helpers */
-  .rv{opacity:0;transform:translate3d(0,18px,0);transition:opacity .7s ease,transform .7s cubic-bezier(.22,1,.36,1)}
-  .scene.active .rv{opacity:1;transform:translate3d(0,0,0)}
-  .rv-scale{opacity:0;transform:scale(.92) translate3d(0,10px,0);transition:opacity .8s ease,transform .8s cubic-bezier(.22,1,.36,1)}
-  .scene.active .rv-scale{opacity:1;transform:scale(1) translate3d(0,0,0)}
+/* ============ HERO (CSS product visual, no photo) ============ */
+.hero{position:relative;display:grid;place-items:center;width:100%;height:calc(var(--u)*44);flex:none}
+.hero.s{height:calc(var(--u)*30)}
+.hero.xs{height:calc(var(--u)*22)}
+.gem{position:relative;width:100%;height:100%;display:grid;place-items:center}
+.orb{position:relative;width:64%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  background:
+    radial-gradient(circle at 32% 26%, #ffffff 0%, rgba(255,255,255,.2) 34%, transparent 55%),
+    conic-gradient(from 210deg, #4285f4, #8b5cf6, #ec4899, #fbbc05, #34a853, #4285f4);
+  box-shadow:
+    0 calc(var(--u)*3) calc(var(--u)*7) rgba(15,23,48,.28),
+    0 0 calc(var(--u)*7) rgba(139,92,246,.35),
+    inset 0 0 calc(var(--u)*4) rgba(255,255,255,.45);
+  animation:float 5.6s ease-in-out infinite}
+.orb::after{content:"";position:absolute;inset:14%;border-radius:50%;
+  background:radial-gradient(circle at 50% 55%, rgba(15,23,48,.14), rgba(15,23,48,.02) 60%, transparent 75%)}
+.orb svg{width:44%;height:44%;position:relative;z-index:2;fill:rgba(255,255,255,.92);
+  filter:drop-shadow(0 calc(var(--u)*.6) calc(var(--u)*1.4) rgba(15,23,48,.35))}
+.sheen{position:absolute;top:8%;left:16%;width:30%;height:16%;border-radius:50%;transform:rotate(-24deg);
+  background:linear-gradient(120deg, rgba(255,255,255,.85), rgba(255,255,255,0));filter:blur(calc(var(--u)*.7));
+  animation:sheen 6.5s ease-in-out infinite}
+.ring{position:absolute;width:82%;aspect-ratio:1;border-radius:50%;border:1px solid rgba(66,133,244,.28);
+  animation:ringPulse 4.4s ease-out infinite}
+.ring.r2{width:100%;border-color:rgba(139,92,246,.18);animation-delay:1.6s}
+.halo{position:absolute;width:88%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle, rgba(139,92,246,.30), rgba(66,133,244,.14) 45%, transparent 70%);
+  filter:blur(calc(var(--u)*2));animation:halo 5.6s ease-in-out infinite}
+.floor{position:absolute;bottom:2%;left:50%;transform:translateX(-50%);width:52%;height:calc(var(--u)*3.4);
+  border-radius:50%;background:radial-gradient(ellipse at center, rgba(15,23,48,.34), rgba(15,23,48,0) 70%);
+  filter:blur(calc(var(--u)*.8));animation:floorPulse 5.6s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translate3d(0,calc(var(--u)*.9),0) rotate(-2deg)}50%{transform:translate3d(0,calc(var(--u)*-1.1),0) rotate(2deg)}}
+@keyframes sheen{0%,72%,100%{opacity:0;transform:translate3d(-10%,0,0) rotate(-24deg)}82%{opacity:.95;transform:translate3d(60%,10%,0) rotate(-24deg)}}
+@keyframes ringPulse{0%{transform:scale(.9);opacity:0}25%{opacity:.75}100%{transform:scale(1.18);opacity:0}}
+@keyframes halo{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+@keyframes floorPulse{0%,100%{transform:translateX(-50%) scale(1);opacity:.85}50%{transform:translateX(-50%) scale(.86);opacity:.55}}
 
-  .kicker{
-    display:inline-flex;align-items:center;gap:8px;
-    font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--accent);background:var(--accent-soft);
-    border:1px solid rgba(67,83,232,.18);
-    padding:7px 14px;border-radius:99px;width:fit-content;
-  }
-  .kicker .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-grad)}
+/* ============ CARDS ============ */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*2.2)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:calc(var(--u)*3.4);
+  padding:calc(var(--u)*3) calc(var(--u)*2.8);box-shadow:var(--shadow-soft);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.card .ico{width:calc(var(--u)*7);height:calc(var(--u)*7);border-radius:calc(var(--u)*2.2);display:grid;place-items:center;margin-bottom:calc(var(--u)*1.8);
+  background:linear-gradient(140deg, rgba(66,133,244,.14), rgba(139,92,246,.14));color:var(--accent)}
+.card .ico svg{width:58%;height:58%;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.card h3{font-family:'Sora',sans-serif;font-size:calc(var(--u)*3.5);font-weight:700;color:var(--ink);letter-spacing:-.015em;margin-bottom:calc(var(--u)*.7)}
+.card p{font-size:calc(var(--u)*2.7);line-height:1.4;color:var(--ink-soft)}
 
-  h1,h2{font-family:'Sora',sans-serif;letter-spacing:-.02em;line-height:1.08}
+.chips{display:flex;flex-wrap:wrap;gap:calc(var(--u)*1.6);justify-content:center}
+.chip{font-size:calc(var(--u)*2.7);font-weight:600;color:var(--accent-2);padding:calc(var(--u)*1.2) calc(var(--u)*2.6);
+  border-radius:99px;background:rgba(255,255,255,.8);border:1px solid rgba(139,92,246,.24);box-shadow:var(--shadow-soft)}
 
-  /* ============ SCENE 1 — HOOK ============ */
-  .s1 .scene-inner{justify-content:center;align-items:center;text-align:center;gap:22px}
-  .gem{
-    position:relative;width:150px;height:150px;margin-bottom:6px;
-    animation:gemFloat 5s ease-in-out infinite;
-  }
-  @keyframes gemFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-10px,0)}}
-  .gem svg{width:100%;height:100%;filter:drop-shadow(0 24px 40px rgba(67,83,232,.35))}
-  .gem-glow{
-    position:absolute;inset:-40px;z-index:-1;border-radius:50%;
-    background:radial-gradient(circle,rgba(67,83,232,.28) 0%,rgba(147,51,234,.14) 45%,transparent 70%);
-    animation:glowPulse 4s ease-in-out infinite;
-  }
-  @keyframes glowPulse{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.07)}}
-  .s1 h1{font-size:44px;font-weight:800}
-  .s1 h1 .grad{
-    background:var(--accent-grad);
-    -webkit-background-clip:text;background-clip:text;
-    -webkit-text-fill-color:transparent;color:var(--accent);
-  }
-  .s1 .sub{font-size:16px;color:var(--ink-soft);max-width:280px;line-height:1.5}
-  .s1 .price-chip{
-    display:inline-flex;align-items:baseline;gap:8px;
-    background:var(--card);border:1px solid var(--line);
-    box-shadow:var(--shadow-card);border-radius:16px;padding:12px 22px;
-  }
-  .s1 .price-chip .p{font-family:'Sora';font-size:26px;font-weight:800;background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--accent)}
-  .s1 .price-chip .t{font-size:13px;color:var(--ink-soft);font-weight:600}
+/* ============ OFFER ============ */
+.offer-card{width:100%;background:var(--card);border:1px solid var(--line);border-radius:calc(var(--u)*4.4);
+  padding:calc(var(--u)*4);box-shadow:var(--shadow);text-align:center}
+.price{font-family:'Sora',sans-serif;font-weight:800;letter-spacing:-.05em;line-height:.9;
+  font-size:calc(var(--u)*19);color:var(--ink)}
+.price .cur{font-size:calc(var(--u)*5.6);font-weight:700;letter-spacing:-.01em;color:var(--ink-soft);margin-left:calc(var(--u)*1)}
+.period{font-size:calc(var(--u)*3.4);font-weight:600;color:var(--ink-soft)}
+.incl{list-style:none;display:grid;gap:calc(var(--u)*1.6);margin-top:calc(var(--u)*2.6);text-align:left}
+.incl li{position:relative;padding-left:calc(var(--u)*4.6);font-size:calc(var(--u)*3.1);color:var(--ink);font-weight:500;line-height:1.35}
+.incl li::before{content:"";position:absolute;left:0;top:calc(var(--u)*.7);width:calc(var(--u)*2.6);height:calc(var(--u)*2.6);
+  border-radius:50%;background:linear-gradient(140deg,var(--accent),var(--accent-2));
+  box-shadow:0 calc(var(--u)*.6) calc(var(--u)*1.4) rgba(66,133,244,.4)}
+.incl li::after{content:"";position:absolute;left:calc(var(--u)*.95);top:calc(var(--u)*1.55);width:calc(var(--u)*.7);height:calc(var(--u)*1.3);
+  border-left:1.6px solid #fff;border-bottom:1.6px solid #fff;transform:rotate(-45deg)}
+.badge-line{display:inline-flex;align-items:center;gap:calc(var(--u)*1);padding:calc(var(--u)*1) calc(var(--u)*2.4);
+  border-radius:99px;font-size:calc(var(--u)*2.5);font-weight:700;letter-spacing:.04em;
+  color:#fff;background:linear-gradient(120deg,var(--accent-2),var(--accent-3));box-shadow:0 calc(var(--u)*1.4) calc(var(--u)*3) rgba(139,92,246,.35)}
 
-  /* ============ SCENE 2 — BENEFITS ============ */
-  .s2 .scene-inner{gap:18px}
-  .s2 .head{display:flex;flex-direction:column;gap:10px}
-  .s2 h2{font-size:28px;font-weight:700}
-  .s2 .head p{font-size:13.5px;color:var(--ink-soft)}
-  .benefits{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
-  .benefit{
-    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-    padding:16px 15px;box-shadow:var(--shadow-card);
-    display:flex;flex-direction:column;gap:7px;min-height:118px;
-  }
-  .benefit .ico{
-    width:36px;height:36px;border-radius:11px;
-    background:var(--accent-soft);display:flex;align-items:center;justify-content:center;
-  }
-  .benefit .ico svg{width:18px;height:18px;color:var(--accent)}
-  .benefit h3{font-family:'Sora';font-size:14.5px;font-weight:700;letter-spacing:-.01em}
-  .benefit p{font-size:11.5px;color:var(--ink-soft);line-height:1.45}
-  @media (max-height:640px){.benefit{min-height:0;padding:13px 12px}.benefit h3{font-size:13.5px}.benefit p{font-size:11px}}
+/* ============ CTA ============ */
+.cta{pointer-events:auto;display:inline-flex;align-items:center;justify-content:center;gap:calc(var(--u)*1.6);
+  width:100%;padding:calc(var(--u)*4.2) calc(var(--u)*4);border:0;cursor:pointer;text-decoration:none;
+  border-radius:99px;font-family:'Sora',sans-serif;font-weight:700;font-size:calc(var(--u)*4.3);color:#fff;
+  background:linear-gradient(115deg,var(--accent) 0%,var(--accent-2) 55%,var(--accent-3) 115%);
+  box-shadow:0 calc(var(--u)*2.4) calc(var(--u)*5) rgba(66,133,244,.38), inset 0 1px 0 rgba(255,255,255,.35);
+  animation:ctaPulse 2.8s ease-in-out infinite}
+@keyframes ctaPulse{0%,100%{box-shadow:0 calc(var(--u)*2.4) calc(var(--u)*5) rgba(66,133,244,.35), inset 0 1px 0 rgba(255,255,255,.35)}
+  50%{box-shadow:0 calc(var(--u)*3.2) calc(var(--u)*7.5) rgba(139,92,246,.5), inset 0 1px 0 rgba(255,255,255,.45)}}
+.support{font-size:calc(var(--u)*2.9);color:var(--ink-soft);line-height:1.45}
+.foot{font-size:calc(var(--u)*2.4);color:rgba(77,90,125,.7);letter-spacing:.02em}
 
-  /* ============ SCENE 3 — EXPERIENCE ============ */
-  .s3 .scene-inner{justify-content:center;align-items:center;text-align:center;gap:26px}
-  .s3 .quote-wrap{position:relative;max-width:300px}
-  .s3 .big-quote{
-    font-family:'Sora';font-size:30px;font-weight:700;line-height:1.35;letter-spacing:-.02em;
-    background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--accent);
-  }
-  .s3 .quote-sub{font-size:14px;color:var(--ink-soft);line-height:1.6;margin-top:14px}
-  .s3 .stat-row{display:flex;gap:12px;margin-top:4px}
-  .s3 .stat{
-    flex:1;background:var(--card);border:1px solid var(--line);border-radius:16px;
-    padding:14px 10px;box-shadow:var(--shadow-card);
-  }
-  .s3 .stat .n{font-family:'Sora';font-size:22px;font-weight:800;color:var(--accent)}
-  .s3 .stat .l{font-size:10.5px;color:var(--ink-soft);font-weight:600;margin-top:3px;letter-spacing:.02em}
-  .s3 .orbit{
-    position:absolute;width:340px;height:340px;border-radius:50%;
-    border:1px solid rgba(67,83,232,.14);
-    animation:orbitSpin 24s linear infinite;pointer-events:none;
-  }
-  .s3 .orbit::before{
-    content:'';position:absolute;top:-5px;left:50%;width:10px;height:10px;border-radius:50%;
-    background:var(--accent-grad);box-shadow:0 0 14px rgba(67,83,232,.6);
-  }
-  @keyframes orbitSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+/* ============ SHORT SCREENS ============ */
+@media (max-height:680px){
+  .hero{height:calc(var(--u)*36)} .hero.s{height:calc(var(--u)*24)} .hero.xs{height:calc(var(--u)*18)}
+  .scene-inner{gap:calc(var(--u)*1.8)}
+  .title{font-size:calc(var(--u)*11.6)}
+  .price{font-size:calc(var(--u)*16)}
+  .card{padding:calc(var(--u)*2.4) calc(var(--u)*2.2)}
+  .card p{font-size:calc(var(--u)*2.5)}
+}
+@media (max-height:560px){
+  .lede{font-size:calc(var(--u)*3.2)}
+  .card h3{font-size:calc(var(--u)*3.1)}
+  .incl li{font-size:calc(var(--u)*2.8)}
+}
 
-  /* ============ SCENE 4 — OFFER ============ */
-  .s4 .scene-inner{justify-content:center;gap:20px}
-  .s4 .offer-card{
-    position:relative;background:var(--card);border:1px solid var(--line);
-    border-radius:26px;padding:30px 24px;box-shadow:var(--shadow-hero);
-    text-align:center;overflow:hidden;
-  }
-  .s4 .offer-card::before{
-    content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--accent-grad);
-  }
-  .s4 .offer-badge{
-    display:inline-block;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-    color:#fff;background:var(--accent-grad);padding:6px 16px;border-radius:99px;margin-bottom:16px;
-  }
-  .s4 .price{font-family:'Sora';font-size:64px;font-weight:800;letter-spacing:-.03em;line-height:1}
-  .s4 .price .cur{font-size:24px;font-weight:700;color:var(--ink-soft);margin-left:4px}
-  .s4 .price-note{font-size:13.5px;color:var(--ink-soft);font-weight:600;margin-top:8px}
-  .s4 .divider{height:1px;background:var(--line);margin:20px 0}
-  .s4 .incl{display:flex;flex-direction:column;gap:10px;text-align:left}
-  .s4 .incl li{
-    display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink);font-weight:500;
-    list-style:none;
-  }
-  .s4 .incl .ck{
-    flex:none;width:20px;height:20px;border-radius:50%;
-    background:var(--accent-soft);display:flex;align-items:center;justify-content:center;
-  }
-  .s4 .incl .ck svg{width:11px;height:11px;color:var(--accent)}
-  .s4 .fine{font-size:10.5px;color:var(--ink-faint);margin-top:16px;line-height:1.5}
-
-  /* ============ SCENE 5 — CTA ============ */
-  .s5 .scene-inner{justify-content:center;align-items:center;text-align:center;gap:20px}
-  .s5 .mini-gem{width:74px;height:74px;animation:gemFloat 5s ease-in-out infinite}
-  .s5 .mini-gem svg{width:100%;height:100%;filter:drop-shadow(0 14px 24px rgba(67,83,232,.30))}
-  .s5 h2{font-size:32px;font-weight:800}
-  .s5 h2 .grad{background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--accent)}
-  .s5 .offer-line{font-size:15px;color:var(--ink-soft);font-weight:600}
-  .s5 .offer-line b{color:var(--ink);font-family:'Sora';font-size:17px}
-  .cta{
-    display:inline-flex;align-items:center;justify-content:center;gap:10px;
-    font-family:'Sora';font-size:17px;font-weight:700;color:#fff;
-    background:var(--accent-grad);border:none;border-radius:18px;
-    padding:18px 44px;width:100%;max-width:300px;cursor:pointer;
-    box-shadow:0 14px 34px rgba(67,83,232,.38);
-    text-decoration:none;
-    animation:ctaPulse 2.6s ease-in-out infinite;
-  }
-  @keyframes ctaPulse{
-    0%,100%{box-shadow:0 14px 34px rgba(67,83,232,.38)}
-    50%{box-shadow:0 14px 44px rgba(147,51,234,.52)}
-  }
-  .cta svg{width:18px;height:18px}
-  .s5 .support{font-size:12px;color:var(--ink-faint);line-height:1.5;max-width:260px}
-
-  /* ---------- REDUCED MOTION ---------- */
-  @media (prefers-reduced-motion: reduce){
-    .blob,.gem,.mini-gem,.orbit,.cta,.gem-glow{animation:none !important}
-    .rv,.rv-scale{transition-duration:.01s}
-    .scene{transition-duration:.01s}
-  }
-
-  /* short screens */
-  @media (max-height:560px){
-    .scene{padding:56px 20px 24px}
-    .s1 h1{font-size:36px}
-    .gem{width:110px;height:110px}
-    .s4 .price{font-size:52px}
-    .s5 h2{font-size:26px}
-  }
+/* ============ REDUCED MOTION ============ */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .scene.is-active [data-anim]{opacity:1!important}
+  .scene.is-active .cam{opacity:1!important;transform:none!important}
+}
 </style>
 </head>
 <body>
 
-<div class="frame" id="frame">
-  <!-- background -->
-  <div class="bg">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
+<div class="stage">
+  <div class="frame" id="frame">
+    <div class="bg">
+      <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+    </div>
+    <canvas id="fx"></canvas>
+    <div class="grain"></div>
+    <div class="vignette"></div>
+
+    <div class="ui">
+      <div class="progress" id="progress"></div>
+
+      <button class="sound" id="soundBtn" type="button" aria-pressed="true" aria-label="Ovozni boshqarish">
+        <svg class="wave-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a9 9 0 0 1 0 12"/></svg>
+        <svg class="muted-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>
+      </button>
+
+      <!-- ============ SCENE 1 — HOOK ============ -->
+      <section class="scene is-active" id="scene-0" aria-hidden="false">
+        <div class="cam" style="--cam-from:1.08;--cam-dur:4s"></div>
+        <div class="scene-inner center">
+          <div class="hero">
+            <span class="halo"></span>
+            <div class="gem">
+              <span class="ring"></span><span class="ring r2"></span>
+              <div class="orb">
+                <span class="sheen"></span>
+                <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6c4.6 24.4 19.6 39.4 44 44-24.4 4.6-39.4 19.6-44 44-4.6-24.4-19.6-39.4-44-44 24.4-4.6 39.4-19.6 44-44z"/></svg>
+              </div>
+            </div>
+            <span class="floor"></span>
+          </div>
+          <span class="kicker" data-anim data-sfx-type="badge" data-sfx-delay="140">Sun’iy intellekt yordamchisi</span>
+          <h1 class="title" data-anim data-sfx-type="headline" data-sfx-delay="300">Gemini <span class="grad">Pro</span></h1>
+          <p class="lede" data-anim data-sfx-type="subtext" data-sfx-delay="620">18 oy davomida matn, rasm, kod va tahlil — bitta suhbatda.</p>
+        </div>
+      </section>
+
+      <!-- ============ SCENE 2 — BENEFITS ============ -->
+      <section class="scene" id="scene-1" aria-hidden="true">
+        <div class="cam" style="--cam-from:1.05;--cam-dur:4s"></div>
+        <div class="scene-inner">
+          <span class="kicker" data-anim data-sfx-type="badge" data-sfx-delay="120" style="align-self:flex-start">Nima beradi?</span>
+          <h2 class="s-title" data-anim data-sfx-type="headline" data-sfx-delay="260">Bitta yordamchi — to‘rtta vazifa</h2>
+          <div class="cards" id="cards"></div>
+          <p class="note" data-anim data-sfx-type="subtext" data-sfx-delay="1180">Imkoniyatlar foydalanish shartlari va mavjudligiga bog‘liq.</p>
+        </div>
+      </section>
+
+      <!-- ============ SCENE 3 — EXPERIENCE ============ -->
+      <section class="scene" id="scene-2" aria-hidden="true">
+        <div class="cam" style="--cam-from:1.12;--cam-dur:4s"></div>
+        <div class="scene-inner center">
+          <div class="hero s">
+            <span class="halo"></span>
+            <div class="gem">
+              <span class="ring"></span>
+              <div class="orb">
+                <span class="sheen"></span>
+                <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6c4.6 24.4 19.6 39.4 44 44-24.4 4.6-39.4 19.6-44 44-4.6-24.4-19.6-39.4-44-44 24.4-4.6 39.4-19.6 44-44z"/></svg>
+              </div>
+            </div>
+            <span class="floor"></span>
+          </div>
+          <h2 class="s-title" data-anim data-sfx-type="headline" data-sfx-delay="240">Savolni yozing — javobni oling</h2>
+          <p class="lede" data-anim data-sfx-type="subtext" data-sfx-delay="520">Matn, rasm va kod bilan ishlash endi bir xil suhbatda. Ish, o‘qish va yaratish tezroq.</p>
+          <div class="chips" id="chips"></div>
+        </div>
+      </section>
+
+      <!-- ============ SCENE 4 — OFFER ============ -->
+      <section class="scene" id="scene-3" aria-hidden="true">
+        <div class="cam" style="--cam-from:1.06;--cam-dur:4s"></div>
+        <div class="scene-inner">
+          <div class="hero xs">
+            <span class="halo"></span>
+            <div class="gem">
+              <div class="orb">
+                <span class="sheen"></span>
+                <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6c4.6 24.4 19.6 39.4 44 44-24.4 4.6-39.4 19.6-44 44-4.6-24.4-19.6-39.4-44-44 24.4-4.6 39.4-19.6 44-44z"/></svg>
+              </div>
+            </div>
+            <span class="floor"></span>
+          </div>
+          <div class="offer-card center">
+            <span class="badge-line" data-anim data-sfx-type="badge" data-sfx-delay="140">18 OYLIK KIRISH</span>
+            <p class="price" data-anim data-sfx-type="price" data-sfx-delay="300" id="priceMain">20 000<span class="cur">so'm</span></p>
+            <p class="period" data-anim data-sfx-type="subtext" data-sfx-delay="640" id="period">Gemini Pro · 18 oy</p>
+            <ul class="incl" id="incl"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SCENE 5 — CTA ============ -->
+      <section class="scene" id="scene-4" aria-hidden="true">
+        <div class="cam" style="--cam-from:1.1;--cam-dur:4s"></div>
+        <div class="scene-inner center">
+          <div class="hero s">
+            <span class="halo"></span>
+            <div class="gem">
+              <span class="ring r2"></span>
+              <div class="orb">
+                <span class="sheen"></span>
+                <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6c4.6 24.4 19.6 39.4 44 44-24.4 4.6-39.4 19.6-44 44-4.6-24.4-19.6-39.4-44-44 24.4-4.6 39.4-19.6 44-44z"/></svg>
+              </div>
+            </div>
+            <span class="floor"></span>
+          </div>
+          <h2 class="s-title" data-anim data-sfx-type="headline" data-sfx-delay="220" id="ctaTitle">Gemini Pro</h2>
+          <p class="price" data-anim data-sfx-type="price" data-sfx-delay="440" id="priceCta" style="font-size:calc(var(--u)*10.5)">20 000<span class="cur">so'm</span> <span class="cur" style="opacity:.7">/ 18 oy</span></p>
+          <a class="cta" data-anim data-sfx-type="cta" data-sfx-delay="720" id="cta" href="#" target="_blank" rel="noopener">Buyurtma berish</a>
+          <p class="support" data-anim data-sfx-type="subtext" data-sfx-delay="980">Batafsil ma’lumot va savollar uchun biz bilan bog‘laning.</p>
+          <p class="foot" data-anim data-sfx-type="subtext" data-sfx-delay="1160" id="foot">Gemini Pro · 18 oylik kirish</p>
+        </div>
+      </section>
+    </div>
   </div>
-  <canvas id="particles"></canvas>
-  <div class="grain"></div>
-
-  <!-- progress bars -->
-  <div class="progress" id="progress" aria-hidden="true"></div>
-
-  <!-- sound toggle -->
-  <button class="sound-btn" id="soundBtn" aria-label="Ovozni yoqish / o'chirish">
-    <svg id="iconSoundOn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-    <svg id="iconSoundOff" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-  </button>
-
-  <!-- ============ SCENE 1 : HOOK ============ -->
-  <section class="scene s1 active" id="scene-1">
-    <div class="scene-inner">
-      <div class="gem rv-scale" data-sfx-type="badge" data-sfx-delay="150">
-        <div class="gem-glow"></div>
-        <svg viewBox="0 0 100 100" aria-hidden="true">
-          <defs>
-            <linearGradient id="gemGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#4353e8"/>
-              <stop offset="55%" stop-color="#9333ea"/>
-              <stop offset="100%" stop-color="#ec4899"/>
-            </linearGradient>
-          </defs>
-          <path d="M50 4 L92 30 L92 70 L50 96 L8 70 L8 30 Z" fill="url(#gemGrad)"/>
-          <path d="M50 4 L92 30 L50 52 L8 30 Z" fill="rgba(255,255,255,.30)"/>
-          <path d="M50 52 L92 30 L92 70 L50 96 Z" fill="rgba(255,255,255,.12)"/>
-          <path d="M50 52 L8 30 L8 70 L50 96 Z" fill="rgba(0,0,0,.10)"/>
-          <path d="M50 4 L50 52 L8 30 Z" fill="rgba(255,255,255,.22)"/>
-        </svg>
-      </div>
-      <span class="kicker rv" data-sfx-type="badge" data-sfx-delay="350"><span class="dot"></span>Google AI Pro obuna</span>
-      <h1 class="rv" data-sfx-type="headline" data-sfx-delay="550">Gemini <span class="grad">Pro</span></h1>
-      <p class="sub rv" data-sfx-type="subtext" data-sfx-delay="800">18 oylik to'liq Pro obuna — Google ning eng kuchli AI modeli bilan</p>
-      <div class="price-chip rv" data-sfx-type="price" data-sfx-delay="1050">
-        <span class="p">20 000 so'm</span>
-        <span class="t">/ 18 oy</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SCENE 2 : BENEFITS ============ -->
-  <section class="scene s2" id="scene-2">
-    <div class="scene-inner">
-      <div class="head">
-        <span class="kicker rv" data-sfx-type="badge" data-sfx-delay="150"><span class="dot"></span>Nima uchun Pro?</span>
-        <h2 class="rv" data-sfx-type="headline" data-sfx-delay="350">Pro obunaning asosiy foydasi</h2>
-        <p class="rv" data-sfx-type="subtext" data-sfx-delay="550">Google AI Pro tarifining real imkoniyatlari</p>
-      </div>
-      <div class="benefits">
-        <div class="benefit rv" data-sfx-type="feature" data-sfx-delay="800">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg></div>
-          <h3>Gemini 3.1 Pro model</h3>
-          <p>Eng kuchli Pro modelga to'liq kirish — murakkab savollarga chuqur javob</p>
-        </div>
-        <div class="benefit rv" data-sfx-type="feature" data-sfx-delay="950">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-          <h3>4x yuqori limitlar</h3>
-          <p>Bepul tarifga nisbatan 4 baravar ko'proq so'rov imkoniyati</p>
-        </div>
-        <div class="benefit rv" data-sfx-type="feature" data-sfx-delay="1100">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-          <h3>1 mln token kontekst</h3>
-          <p>~1500 sahifalik hujjat yoki 30 000 qator kodni birga tahlil qilish</p>
-        </div>
-        <div class="benefit rv" data-sfx-type="feature" data-sfx-delay="1250">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></div>
-          <h3>Deep Research</h3>
-          <p>Chuqur tadqiqot rejimi — manbalar bo'yicha tahlil va hisobot</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SCENE 3 : EXPERIENCE ============ -->
-  <section class="scene s3" id="scene-3">
-    <div class="scene-inner">
-      <div class="orbit"></div>
-      <div class="quote-wrap">
-        <p class="big-quote rv" data-sfx-type="headline" data-sfx-delay="250">Kundalik ishlaringizda AI — endi Pro darajada</p>
-        <p class="quote-sub rv" data-sfx-type="subtext" data-sfx-delay="600">Gmail, Docs, Sheets va boshqa Google ilovalarida Gemini to'g'ridan-to'g'ri ishlaydi. Matn yozish, tahlil qilish, kod yozish — barchasi bitta obunada.</p>
-      </div>
-      <div class="stat-row">
-        <div class="stat rv" data-sfx-type="feature" data-sfx-delay="950"><div class="n">5 TB</div><div class="l">Google One xotira</div></div>
-        <div class="stat rv" data-sfx-type="feature" data-sfx-delay="1100"><div class="n">NotebookLM</div><div class="l">Premium imkoniyatlar</div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SCENE 4 : OFFER ============ -->
-  <section class="scene s4" id="scene-4">
-    <div class="scene-inner">
-      <div class="offer-card rv-scale" data-sfx-type="badge" data-sfx-delay="150">
-        <span class="offer-badge">Maqsadli taklif</span>
-        <div class="price rv" data-sfx-type="price" data-sfx-delay="400">20 000<span class="cur">so'm</span></div>
-        <div class="price-note rv" data-sfx-type="subtext" data-sfx-delay="600">to'liq 18 oylik Google AI Pro obuna</div>
-        <div class="divider"></div>
-        <ul class="incl">
-          <li class="rv" data-sfx-type="feature" data-sfx-delay="850"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Gemini 3.1 Pro — to'liq kirish</li>
-          <li class="rv" data-sfx-type="feature" data-sfx-delay="1000"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>4x yuqoriroq so'rov limitlari</li>
-          <li class="rv" data-sfx-type="feature" data-sfx-delay="1150"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Deep Research va 1 mln token kontekst</li>
-          <li class="rv" data-sfx-type="feature" data-sfx-delay="1300"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>5 TB Google One xotira</li>
-        </ul>
-        <p class="fine rv" data-sfx-type="subtext" data-sfx-delay="1500">Google AI Pro 18+ yosh uchun. Limitlar model va so'rov murakkabligiga qarab o'zgarishi mumkin.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SCENE 5 : CTA ============ -->
-  <section class="scene s5" id="scene-5">
-    <div class="scene-inner">
-      <div class="mini-gem rv-scale" data-sfx-type="badge" data-sfx-delay="150">
-        <svg viewBox="0 0 100 100" aria-hidden="true">
-          <path d="M50 4 L92 30 L92 70 L50 96 L8 70 L8 30 Z" fill="url(#gemGrad)"/>
-          <path d="M50 4 L92 30 L50 52 L8 30 Z" fill="rgba(255,255,255,.30)"/>
-          <path d="M50 52 L92 30 L92 70 L50 96 Z" fill="rgba(255,255,255,.12)"/>
-          <path d="M50 52 L8 30 L8 70 L50 96 Z" fill="rgba(0,0,0,.10)"/>
-        </svg>
-      </div>
-      <h2 class="rv" data-sfx-type="headline" data-sfx-delay="350">Gemini <span class="grad">Pro</span></h2>
-      <p class="offer-line rv" data-sfx-type="subtext" data-sfx-delay="550"><b>20 000 so'm</b> — 18 oylik to'liq obuna</p>
-      <a class="cta rv" data-sfx-type="cta" data-sfx-delay="800" href="#" target="_blank" rel="noopener">
-        Buyurtma berish
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </a>
-      <p class="support rv" data-sfx-type="subtext" data-sfx-delay="1050">Buyurtma bo'yicha savollaringiz bo'lsa, biz bilan bog'laning</p>
-    </div>
-  </section>
-
-  <div class="vignette"></div>
 </div>
 
 <script>
-/* ================================================================
-   CONFIG — tahrirlash mumkin bo'lgan marketing ma'lumotlari
-   ================================================================ */
+(function(){
+"use strict";
+
+/* ============================================================
+   CONFIG — marketing fields (edit only this block)
+   ============================================================ */
 const CONFIG = {
-  brand: "Google",
+  brand: "Gemini",
   productName: "Gemini Pro",
-  category: "AI obuna",
-  price: "20 000",
+  category: "Sun’iy intellekt yordamchisi",
+  heroText: "18 oy davomida matn, rasm, kod va tahlil — bitta suhbatda.",
+  price: "20 000",            // narxi (bo'sh qoldirilsa ko'rsatilmaydi)
   currency: "so'm",
-  durationLabel: "18 oy",
+  offerText: "Gemini Pro · 18 oy",
   ctaText: "Buyurtma berish",
-  ctaUrl: "#",               // <-- real URL ni shu yerga qo'ying
-  footer: "Buyurtma bo'yicha savollaringiz bo'lsa, biz bilan bog'laning",
-  sceneDurations: [4000, 4000, 4000, 4000, 4000]  // har sahifa davomiyligi (ms)
+  ctaUrl: "#",                 // haqiqiy linkni shu yerga yozing
+  footer: "Gemini Pro · 18 oylik kirish",
+  features: [                  // umumiy foydalar (tekshirilgan specifikatsiya emas)
+    { icon: "text",  title: "Matn va yozish", text: "Qaror, xat va postlarni tayyorlab beradi." },
+    { icon: "image", title: "Rasm va g‘oya",  text: "Vizual g‘oyalar va tasvirlar uchun yordam." },
+    { icon: "code",  title: "Kod va dasturlash", text: "Kod yozish va xatolarni tushuntirishda yordamchi." },
+    { icon: "chart", title: "Tahlil va tadqiqot", text: "Uzun matn va fayllarni qisqa qilib izohlaydi." }
+  ],
+  inclusions: ["18 oy to‘liq kirish", "Matn, rasm, kod va tahlil bilan ishlash", "Bitta to‘lov — 18 oy davomida"],
+  chips: ["Matn", "Rasm", "Kod", "Tahlil"],
+  durations: [4, 4, 4, 4, 4]   // har sahna sekundlarda (jami ~20 s)
 };
 
-/* ================================================================
-   SCENE ENGINE — deterministik, requestAnimationFrame asosida
-   ================================================================ */
-(function(){
-  "use strict";
+/* ============================================================
+   DOM helpers
+   ============================================================ */
+const $ = (s, r) => (r || document).querySelector(s);
+const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
+const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const frame = $("#frame"), progressEl = $("#progress");
 
-  const scenes = Array.from(document.querySelectorAll('.scene'));
-  const N = scenes.length;
-  const durations = CONFIG.sceneDurations.slice(0, N);
-  const totalDur = durations.reduce((a,b)=>a+b,0);
+const ICONS = {
+  text:  '<path d="M5 7h14M9 7v10M15 7v10M6 17h12"/>',
+  image: '<rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M4 16l4.5-4.5 3.5 3.5 3-3L20 16"/><circle cx="9" cy="9.5" r="1.3"/>',
+  code:  '<path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/>',
+  chart: '<path d="M4 19h16"/><path d="M7 19V11M12 19V6M17 19v-5"/>'
+};
 
-  const progressEl = document.getElementById('progress');
-  const bars = [];
-  for (let i=0;i<N;i++){
-    const bar = document.createElement('div');
-    bar.className = 'bar';
-    const fill = document.createElement('div');
-    fill.className = 'fill';
-    bar.appendChild(fill);
-    progressEl.appendChild(bar);
-    bars.push({bar, fill});
+/* --- build editable lists --- */
+$("#cards").innerHTML = CONFIG.features.map((f, i) =>
+  '<article class="card" data-anim data-sfx-type="feature" data-sfx-delay="' + (460 + i * 210) + '">' +
+    '<span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS[f.icon] + '</svg></span>' +
+    '<h3>' + f.title + '</h3><p>' + f.text + '</p></article>'
+).join("");
+
+$("#chips").innerHTML = CONFIG.chips.map((c, i) =>
+  '<span class="chip" data-anim data-sfx-type="badge" data-sfx-delay="' + (820 + i * 120) + '">' + c + '</span>'
+).join("");
+
+$("#incl").innerHTML = CONFIG.inclusions.map((t, i) =>
+  '<li data-anim data-sfx-type="feature" data-sfx-delay="' + (760 + i * 170) + '">' + t + '</li>'
+).join("");
+
+if (CONFIG.price) {
+  $("#priceMain").innerHTML = CONFIG.price + '<span class="cur">' + CONFIG.currency + '</span>';
+  $("#priceCta").innerHTML = CONFIG.price + '<span class="cur">' + CONFIG.currency + '</span> <span class="cur" style="opacity:.7">/ 18 oy</span>';
+}
+$("#period").textContent = CONFIG.offerText;
+$("#ctaTitle").textContent = CONFIG.productName;
+$("#foot").textContent = CONFIG.footer;
+$("#cta").textContent = CONFIG.ctaText;
+if (CONFIG.ctaUrl && /^https?:\/\//i.test(CONFIG.ctaUrl)) { $("#cta").href = CONFIG.ctaUrl; }
+else { $("#cta").href = "#"; }
+
+const scenes = Array.prototype.slice.call(document.querySelectorAll(".scene"));
+const DUR = CONFIG.durations.slice();
+const TOTAL = DUR.reduce((a, b) => a + b * 1000, 0);
+const STARTS = []; let acc = 0;
+DUR.forEach(d => { STARTS.push(acc); acc += d * 1000; });
+
+/* --- progress bars: built once, never rebuilt --- */
+const bars = DUR.map(() => {
+  const i = document.createElement("i"), b = document.createElement("b");
+  i.appendChild(b); progressEl.appendChild(i); return b;
+});
+
+/* --- set --u unit and animation delays --- */
+function syncUnits() {
+  frame.style.setProperty("--u", (frame.clientWidth / 100) + "px");
+}
+scenes.forEach(s => s.querySelectorAll("[data-sfx-delay]").forEach(el =>
+  el.style.setProperty("--d", el.getAttribute("data-sfx-delay") + "ms")));
+
+/* ============================================================
+   PARTICLES (decorative, behind text)
+   ============================================================ */
+const canvas = $("#fx"), ctx = canvas.getContext("2d");
+let parts = [], cw = 0, ch = 0, dpr = 1;
+function initParticles() {
+  const r = frame.getBoundingClientRect();
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  cw = r.width; ch = r.height;
+  canvas.width = Math.round(cw * dpr); canvas.height = Math.round(ch * dpr);
+  canvas.style.width = cw + "px"; canvas.style.height = ch + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const n = 26;
+  parts = [];
+  for (let i = 0; i < n; i++) parts.push({
+    x: Math.random() * cw, y: Math.random() * ch,
+    r: 1 + Math.random() * 2.6, sp: 0.06 + Math.random() * 0.16,
+    dx: (Math.random() - 0.5) * 0.14, a: 0.10 + Math.random() * 0.22,
+    c: ["66,133,244", "139,92,246", "236,72,153"][i % 3]
+  });
+}
+function drawParticles() {
+  ctx.clearRect(0, 0, cw, ch);
+  for (const p of parts) {
+    p.y -= p.sp; p.x += p.dx;
+    if (p.y < -6) { p.y = ch + 6; p.x = Math.random() * cw; }
+    if (p.x < -6) p.x = cw + 6; else if (p.x > cw + 6) p.x = -6;
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(" + p.c + "," + p.a + ")";
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
   }
+}
 
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* ============================================================
+   AUDIO — native Web Audio
+   ============================================================ */
+const Sound = {
+  ctx: null, master: null, comp: null, lp: null, wet: null, verb: null, noise: null,
+  muted: false, ready: false, timers: [], pad: null, padGain: null, musTimer: null,
+  nextTime: 0, step: 0, padIdx: -1, disposed: false,
 
-  /* text-reveal SFX rejistri: har sahifa uchun oldindan hisoblangan voqea vaqtlari */
-  const sfxEvents = scenes.map(scene =>
-    Array.from(scene.querySelectorAll('[data-sfx-type]')).map(el => ({
-      type: el.getAttribute('data-sfx-type'),
-      delay: parseInt(el.getAttribute('data-sfx-delay') || '0', 10)
-    }))
-  );
+  init: function () {
+    if (this.ctx || this.disposed) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    const c = this.ctx = new AC();
 
-  let activeIdx = -1;
-  let sfxTimers = [];
+    this.master = c.createGain(); this.master.gain.value = this.muted ? 0 : 1;
+    this.comp = c.createDynamicsCompressor();
+    this.comp.threshold.value = -18; this.comp.knee.value = 22;
+    this.comp.ratio.value = 4; this.comp.attack.value = 0.004; this.comp.release.value = 0.22;
 
-  function clearSfxTimers(){
-    sfxTimers.forEach(t => clearTimeout(t));
-    sfxTimers = [];
-  }
+    this.lp = c.createBiquadFilter(); this.lp.type = "lowpass";
+    this.lp.frequency.value = 5200; this.lp.Q.value = 0.6;
 
-  /* faqat faol sahnada matn SFX larini rejalashtiradi */
-  function scheduleTextSfx(idx){
-    clearSfxTimers();
-    if (reduced) return;
-    sfxEvents[idx].forEach(ev => {
-      const t = setTimeout(() => AudioEngine.textReveal(ev.type), ev.delay);
-      sfxTimers.push(t);
-    });
-  }
+    this.verb = c.createConvolver();
+    this.verb.buffer = this.impulse(c, 1.5, 2.4);
+    this.wet = c.createGain(); this.wet.gain.value = 0.22;
 
-  /* renderAt(timeMs) — istalgan vaqtdagi holatni qayta tiklaydi (export uchun) */
-  function renderAt(timeMs){
-    const t = ((timeMs % totalDur) + totalDur) % totalDur;
-    let acc = 0, idx = 0;
-    for (let i=0;i<N;i++){
-      if (t < acc + durations[i]) { idx = i; break; }
-      acc += durations[i];
-      if (i === N-1) idx = i;
+    this.lp.connect(this.comp); this.verb.connect(this.wet);
+    this.wet.connect(this.comp);
+    this.comp.connect(this.master); this.master.connect(c.destination);
+
+    const len = Math.floor(c.sampleRate * 0.5);
+    const buf = c.createBuffer(1, len, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    this.noise = buf;
+
+    this.buildPad();
+    this.ready = true;
+    this.scheduleMusic();
+    if (c.state === "suspended") c.resume();
+  },
+
+  impulse: function (c, dur, decay) {
+    const rate = c.sampleRate, len = Math.floor(rate * dur);
+    const b = c.createBuffer(2, len, rate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = b.getChannelData(ch);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
     }
-    const local = t - (idx===0 ? 0 : durations.slice(0,idx).reduce((a,b)=>a+b,0));
-    setScene(idx, local, durations[idx]);
-  }
+    return b;
+  },
 
-  function setScene(idx, localMs, durMs){
-    /* progress barlar */
-    bars.forEach((b,i)=>{
-      if (i < idx){ b.bar.classList.add('done'); b.fill.style.width = '100%'; }
-      else if (i === idx){ b.bar.classList.remove('done'); b.fill.style.width = Math.min(100,(localMs/durMs)*100) + '%'; }
-      else { b.bar.classList.remove('done'); b.fill.style.width = '0%'; }
+  /* soft ambient pad */
+  buildPad: function () {
+    const c = this.ctx;
+    this.padGain = c.createGain(); this.padGain.gain.value = 0.0001;
+    const f = c.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 520;
+    this.padGain.connect(f); f.connect(this.lp);
+    this.pad = [];
+    [110, 164.81, 220, 277.18].forEach((freq, i) => {
+      const o = c.createOscillator(); o.type = i === 3 ? "triangle" : "sine";
+      o.frequency.value = freq; o.detune.value = (i - 1.5) * 5;
+      const g = c.createGain(); g.gain.value = i === 3 ? 0.05 : 0.09;
+      o.connect(g); g.connect(this.padGain); o.start();
+      this.pad.push(o);
     });
+    this.padGain.gain.setTargetAtTime(0.10, c.currentTime, 2.4);
+  },
 
-    if (idx === activeIdx) return;
-    activeIdx = idx;
-
-    scenes.forEach((s,i)=>{
-      if (i === idx){
-        s.classList.remove('active');
-        void s.offsetWidth; /* reflow — animatsiyani qayta boshlash uchun */
-        s.classList.add('active');
-      } else {
-        s.classList.remove('active');
-      }
-    });
-
-    AudioEngine.pageTransition(idx);
-    scheduleTextSfx(idx);
-  }
-
-  /* real-time oynash */
-  let startTs = null;
-  function tick(ts){
-    if (startTs === null) startTs = ts;
-    renderAt(ts - startTs);
-    requestAnimationFrame(tick);
-  }
-
-  /* ================================================================
-     WEB AUDIO — ambient bed + sahifa o'tish + matn ochilish SFX
-     ================================================================ */
-  const AudioEngine = (function(){
-    let ctx = null, master = null, comp = null, lp = null, reverb = null, reverbGain = null;
-    let musicGain = null, musicOscs = [], musicTimer = null, nextNoteTime = 0;
-    let muted = false, unlocked = false;
-    const LOOKAHEAD = 200;   // ms
-    const AHEAD = 0.6;       // s
-
-    /* premium akkord progressiyasi (Am – F – C – G uslubida, past chastotalarda) */
+  /* look-ahead music scheduler */
+  scheduleMusic: function () {
+    const c = this.ctx; if (!c) return;
     const CHORDS = [
-      [220.00, 261.63, 329.63],  /* A3 C4 E4 */
-      [174.61, 220.00, 261.63],  /* F3 A3 C4 */
-      [196.00, 246.94, 293.66],  /* G3 B3 D4 */
-      [164.81, 196.00, 246.94]   /* E3 G3 B3 */
+      [110.00, 164.81, 220.00, 277.18],
+      [ 98.00, 146.83, 196.00, 246.94],
+      [123.47, 185.00, 246.94, 293.66],
+      [ 87.31, 130.81, 174.61, 220.00]
     ];
-    const BASS = [110.00, 87.31, 98.00, 82.41];
-
-    function createReverb(){
-      const len = ctx.sampleRate * 1.2;
-      const buf = ctx.createBuffer(2, len, ctx.sampleRate);
-      for (let ch=0; ch<2; ch++){
-        const d = buf.getChannelData(ch);
-        for (let i=0;i<len;i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/len, 2.5);
-      }
-      const c = ctx.createConvolver();
-      c.buffer = buf;
-      return c;
-    }
-
-    function init(){
-      if (ctx) return;
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return;
-      ctx = new AC();
-
-      master = ctx.createGain(); master.gain.value = muted ? 0 : 0.85;
-      comp = ctx.createDynamicsCompressor();
-      comp.threshold.value = -20; comp.knee.value = 24; comp.ratio.value = 4;
-      comp.attack.value = 0.01; comp.release.value = 0.3;
-      lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 6500; lp.Q.value = 0.4;
-
-      reverb = createReverb();
-      reverbGain = ctx.createGain(); reverbGain.gain.value = 0.35;
-      reverb.connect(reverbGain).connect(comp);
-
-      master.connect(lp).connect(comp).connect(ctx.destination);
-
-      musicGain = ctx.createGain(); musicGain.gain.value = 0.0;
-      musicGain.connect(master);
-      musicGain.connect(reverb);
-
-      startMusic();
-      AudioEngine.startupChime();
-    }
-
-    function startMusic(){
-      if (!ctx || musicTimer) return;
-      nextNoteTime = ctx.currentTime + 0.1;
-      let chordIdx = 0;
-      const step = 2.4; /* har akkord 2.4 s */
-      musicTimer = setInterval(()=>{
-        if (!ctx) return;
-        while (nextNoteTime < ctx.currentTime + AHEAD){
-          playChord(CHORDS[chordIdx % CHORDS.length], BASS[chordIdx % BASS.length], nextNoteTime);
-          nextNoteTime += step;
-          chordIdx++;
+    const MEL = [660, 0, 784, 0, 587.33, 0, 0, 880];
+    this.nextTime = c.currentTime + 0.1;
+    const tick = () => {
+      if (this.disposed || !this.ctx) return;
+      const now = this.ctx.currentTime;
+      while (this.nextTime < now + 0.8) {
+        const t = this.nextTime, s = this.step;
+        if (s % 8 === 0) {
+          const idx = (s / 8) % CHORDS.length;
+          this.padIdx = idx;
+          const ch = CHORDS[idx];
+          this.pad.forEach((o, i) => o.frequency.setTargetAtTime(ch[i], t, 1.2));
         }
-      }, LOOKAHEAD);
-    }
-
-    function playChord(freqs, bass, t){
-      freqs.forEach((f,i)=>{
-        const o = ctx.createOscillator();
-        o.type = i === 0 ? 'sine' : 'triangle';
-        o.frequency.value = f;
-        const g = ctx.createGain();
-        g.gain.setValueAtTime(0.0001, t);
-        g.gain.exponentialRampToValueAtTime(0.045, t + 0.4);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + 2.3);
-        o.connect(g).connect(musicGain);
-        o.start(t); o.stop(t + 2.4);
-        musicOscs.push(o);
-      });
-      const b = ctx.createOscillator();
-      b.type = 'sine'; b.frequency.value = bass;
-      const bg = ctx.createGain();
-      bg.gain.setValueAtTime(0.0001, t);
-      bg.gain.exponentialRampToValueAtTime(0.06, t + 0.5);
-      bg.gain.exponentialRampToValueAtTime(0.0001, t + 2.3);
-      b.connect(bg).connect(musicGain);
-      b.start(t); b.stop(t + 2.4);
-      musicOscs.push(b);
-    }
-
-    /* --- one-shot SFX yordamchi --- */
-    function blip({freq=440, type='sine', dur=0.12, gain=0.12, attack=0.008, toReverb=true, glide=0}){
-      if (!ctx || muted) return;
-      const t = ctx.currentTime;
-      const o = ctx.createOscillator();
-      o.type = type; o.frequency.setValueAtTime(freq, t);
-      if (glide) o.frequency.exponentialRampToValueAtTime(freq + glide, t + dur);
-      const g = ctx.createGain();
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(gain, t + attack);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      o.connect(g).connect(master);
-      if (toReverb) g.connect(reverb);
-      o.start(t); o.stop(t + dur + 0.05);
-    }
-
-    function tickNoise(dur=0.05, gain=0.05, freq=3000){
-      if (!ctx || muted) return;
-      const t = ctx.currentTime;
-      const len = Math.max(1, Math.floor(ctx.sampleRate * dur));
-      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-      const d = buf.getChannelData(0);
-      for (let i=0;i<len;i++) d[i] = (Math.random()*2-1) * (1 - i/len);
-      const src = ctx.createBufferSource(); src.buffer = buf;
-      const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 1.2;
-      const g = ctx.createGain(); g.gain.value = gain;
-      src.connect(f).connect(g).connect(master);
-      src.start(t); src.stop(t + dur);
-    }
-
-    /* sahifa o'tish SFX — har sahifa uchun alohida imzo */
-    function pageTransition(idx){
-      if (!ctx || muted) return;
-      switch (idx){
-        case 0: /* yorug' 3 nota imzosi */
-          blip({freq:523.25, dur:0.10, gain:0.10});
-          setTimeout(()=>blip({freq:659.25, dur:0.10, gain:0.10}), 90);
-          setTimeout(()=>blip({freq:783.99, dur:0.16, gain:0.12}), 180);
-          break;
-        case 1: /* biroz ko'tariluvchi ton */
-          blip({freq:392, type:'triangle', dur:0.22, gain:0.09, glide:180});
-          break;
-        case 2: /* texnik/fokuslangan ton */
-          blip({freq:587.33, type:'triangle', dur:0.14, gain:0.09});
-          setTimeout(()=>blip({freq:880, type:'sine', dur:0.12, gain:0.07}), 110);
-          break;
-        case 3: /* yumshoq ochilish toni */
-          blip({freq:329.63, type:'sine', dur:0.30, gain:0.10, glide:130});
-          tickNoise(0.08, 0.03, 2200);
-          break;
-        case 4: /* ishonchli yakuniy ton */
-          blip({freq:440, type:'triangle', dur:0.14, gain:0.11});
-          setTimeout(()=>blip({freq:659.25, type:'triangle', dur:0.14, gain:0.10}), 120);
-          setTimeout(()=>blip({freq:880, type:'sine', dur:0.30, gain:0.13}), 240);
-          break;
+        const note = MEL[s % MEL.length];
+        if (note) this.pluck(note, t, 0.9);
+        if (s % 8 === 0) this.pluck(CHORDS[(s / 8) % CHORDS.length][0] / 2, t, 2.4, 0.5);
+        this.nextTime += 0.5; this.step++;
       }
-    }
-
-    /* matn ochilish SFX — turiga qarab */
-    let lastTextFreq = 0;
-    function textReveal(type){
-      if (!ctx || muted) return;
-      /* takrorlanishda kichik pitch o'zgarishi — robotdek eshitilmasligi uchun */
-      const jitter = (Math.random() - 0.5) * 14;
-      switch (type){
-        case 'headline':
-          blip({freq:293.66 + jitter, type:'triangle', dur:0.18, gain:0.13, attack:0.012});
-          setTimeout(()=>blip({freq:440 + jitter, type:'sine', dur:0.14, gain:0.09}), 70);
-          break;
-        case 'subtext':
-          tickNoise(0.05, 0.04, 3400);
-          blip({freq:880 + jitter, type:'sine', dur:0.07, gain:0.05});
-          break;
-        case 'badge':
-          blip({freq:659.25 + jitter, type:'sine', dur:0.09, gain:0.07});
-          break;
-        case 'price':
-          blip({freq:523.25 + jitter, type:'triangle', dur:0.12, gain:0.14});
-          setTimeout(()=>blip({freq:1046.5 + jitter, type:'sine', dur:0.10, gain:0.09}), 60);
-          break;
-        case 'feature':
-          tickNoise(0.04, 0.035, 4200);
-          blip({freq:740 + jitter, type:'sine', dur:0.06, gain:0.05});
-          break;
-        case 'cta':
-          blip({freq:587.33 + jitter, type:'triangle', dur:0.14, gain:0.15});
-          setTimeout(()=>blip({freq:880 + jitter, type:'triangle', dur:0.14, gain:0.12}), 100);
-          setTimeout(()=>blip({freq:1174.66 + jitter, type:'sine', dur:0.22, gain:0.12}), 200);
-          break;
-      }
-    }
-
-    function startupChime(){
-      if (!ctx || muted) return;
-      blip({freq:523.25, type:'sine', dur:0.12, gain:0.08});
-      setTimeout(()=>blip({freq:783.99, type:'sine', dur:0.20, gain:0.09}), 100);
-    }
-
-    function setMuted(m){
-      muted = m;
-      if (!ctx) return;
-      const t = ctx.currentTime;
-      master.gain.cancelScheduledValues(t);
-      master.gain.setValueAtTime(master.gain.value, t);
-      master.gain.linearRampToValueAtTime(m ? 0.0001 : 0.85, t + 0.15);
-      /* o'chirilganda: yangi SFX larni to'xtatish (master gain orqali) */
-    }
-
-    function cleanup(){
-      if (musicTimer){ clearInterval(musicTimer); musicTimer = null; }
-      musicOscs.forEach(o => { try { o.stop(); } catch(e){} });
-      musicOscs = [];
-      if (ctx){ ctx.close().catch(()=>{}); ctx = null; }
-    }
-
-    return {
-      init, pageTransition, textReveal, setMuted, cleanup,
-      get muted(){ return muted; },
-      get unlocked(){ return unlocked; },
-      set unlocked(v){ unlocked = v; }
+      this.musTimer = setTimeout(tick, 200);
     };
-  })();
+    tick();
+  },
 
-  /* ================================================================
-     OVOZ BOSHQARUVI — birinchi interaktsiyada ochiladi, mute qilmaydi
-     ================================================================ */
-  const soundBtn = document.getElementById('soundBtn');
-  const iconOn = document.getElementById('iconSoundOn');
-  const iconOff = document.getElementById('iconSoundOff');
+  pluck: function (freq, t, dur, vol) {
+    const c = this.ctx; if (!c || this.muted) return;
+    const o = c.createOscillator(), g = c.createGain(), f = c.createBiquadFilter();
+    o.type = "sine"; o.frequency.value = freq;
+    f.type = "lowpass"; f.frequency.setValueAtTime(2400, t); f.frequency.exponentialRampToValueAtTime(700, t + dur);
+    const v = (vol || 1) * 0.045;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(v, t + 0.04);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(f); f.connect(g); g.connect(this.lp); g.connect(this.verb);
+    o.start(t); o.stop(t + dur + 0.05);
+  },
 
-  function updateIcon(){
-    const m = AudioEngine.muted;
-    iconOn.style.display = m ? 'none' : 'block';
-    iconOff.style.display = m ? 'block' : 'none';
-  }
-
-  function onFirstInteraction(){
-    if (AudioEngine.unlocked) return;
-    AudioEngine.unlocked = true;
-    AudioEngine.init();       /* init qilinganida muted=false bo'lgani uchun ovoz yoqilgan holatda boshlanadi */
-    updateIcon();
-  }
-
-  soundBtn.addEventListener('click', ()=>{
-    onFirstInteraction();
-    AudioEngine.setMuted(!AudioEngine.muted);
-    updateIcon();
-  });
-
-  window.addEventListener('pointerdown', onFirstInteraction, { once:false, passive:true });
-  window.addEventListener('keydown', onFirstInteraction, { once:false });
-
-  /* ================================================================
-     CANVAS ZARRACHALAR — sekin, past opacity, mavzuga mos ranglar
-     ================================================================ */
-  const canvas = document.getElementById('particles');
-  const cctx = canvas.getContext('2d');
-  let parts = [], dpr = 1, cw = 0, ch = 0;
-
-  function sizeCanvas(){
-    const r = canvas.parentElement.getBoundingClientRect();
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    cw = r.width; ch = r.height;
-    canvas.width = cw * dpr; canvas.height = ch * dpr;
-    canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px';
-    cctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-
-  function initParts(){
-    const n = reduced ? 0 : 26;
-    parts = [];
-    for (let i=0;i<n;i++){
-      parts.push({
-        x: Math.random()*cw,
-        y: Math.random()*ch,
-        r: 1 + Math.random()*2.2,
-        vx: (Math.random()-0.5)*0.12,
-        vy: (Math.random()-0.5)*0.12 - 0.04,
-        a: 0.08 + Math.random()*0.14,
-        hue: Math.random() < 0.5 ? 235 : 280
-      });
+  /* one-shot SFX engine */
+  sfx: function (type) {
+    if (!this.ctx || this.muted || this.disposed) return;
+    const c = this.ctx, t = c.currentTime + 0.01;
+    const jitter = 1 + (Math.random() - 0.5) * 0.05;      // subtle pitch variation
+    const tone = (freq, dur, vol, type, rev, lp) => {
+      const o = c.createOscillator(), g = c.createGain(), f = c.createBiquadFilter();
+      o.type = type || "sine"; o.frequency.setValueAtTime(freq * jitter, t);
+      if (type === "sine") o.detune.value = (Math.random() - 0.5) * 12;
+      f.type = "lowpass"; f.frequency.value = lp || 3200;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(vol, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(f); f.connect(g); g.connect(this.lp);
+      if (rev) { const rs = c.createGain(); rs.gain.value = rev; g.connect(rs); rs.connect(this.verb); }
+      o.start(t); o.stop(t + dur + 0.04);
+    };
+    const air = (dur, vol, f0, f1) => {
+      const s = c.createBufferSource(); s.buffer = this.noise;
+      const f = c.createBiquadFilter(); f.type = "bandpass"; f.Q.value = 1.1;
+      f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      const g = c.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(vol, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      s.connect(f); f.connect(g); g.connect(this.lp);
+      s.start(t); s.stop(t + dur + 0.02);
+    };
+    switch (type) {
+      case "headline": tone(392, 0.22, 0.16, "sine", 0.35, 2600); tone(587.33, 0.18, 0.09, "sine", 0.25, 3200); break;
+      case "subtext":  tone(523.25, 0.13, 0.075, "triangle", 0.18, 2400); break;
+      case "badge":    tone(1046.5, 0.09, 0.055, "sine", 0.2, 4200); tone(1396.9, 0.07, 0.035, "sine", 0.15, 4600); break;
+      case "feature":  tone(660, 0.1, 0.06, "sine", 0.15, 3400); air(0.06, 0.02, 2600, 1400); break;
+      case "price":    tone(523.25, 0.14, 0.11, "sine", 0.25, 2800);
+                       tone(659.25, 0.14, 0.09, "sine", 0.25, 2800);
+                       tone(880, 0.26, 0.11, "sine", 0.4, 3600); break;
+      case "cta":      tone(261.63, 0.5, 0.12, "triangle", 0.35, 1800);
+                       tone(392, 0.5, 0.09, "sine", 0.35, 2400);
+                       tone(523.25, 0.5, 0.08, "sine", 0.4, 3000); air(0.35, 0.03, 900, 3200); break;
+      default:         tone(440, 0.1, 0.05, "sine", 0.2, 2600);
     }
-  }
+  },
 
-  function drawParts(){
-    cctx.clearRect(0,0,cw,ch);
-    parts.forEach(p=>{
-      p.x += p.vx; p.y += p.vy;
-      if (p.x < -5) p.x = cw+5; if (p.x > cw+5) p.x = -5;
-      if (p.y < -5) p.y = ch+5; if (p.y > ch+5) p.y = -5;
-      cctx.beginPath();
-      cctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      cctx.fillStyle = 'hsla(' + p.hue + ',70%,60%,' + p.a + ')';
-      cctx.fill();
+  /* distinct page-transition sound per scene */
+  scene: function (i) {
+    if (!this.ctx || this.muted || this.disposed) return;
+    const c = this.ctx, t = c.currentTime + 0.01;
+    const sets = [
+      [523.25, 659.25, 783.99],
+      [440.00, 554.37, 659.25],
+      [587.33, 698.46, 880.00],
+      [493.88, 659.25],
+      [523.25, 783.99, 1046.5]
+    ];
+    const seq = sets[i % sets.length];
+    seq.forEach((f, k) => {
+      const o = c.createOscillator(), g = c.createGain(), fl = c.createBiquadFilter();
+      o.type = "sine"; o.frequency.setValueAtTime(f * 0.995, t + k * 0.075);
+      fl.type = "lowpass"; fl.frequency.value = 3400;
+      const st = t + k * 0.075, dur = 0.26;
+      g.gain.setValueAtTime(0.0001, st);
+      g.gain.linearRampToValueAtTime(0.085, st + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + dur);
+      o.connect(fl); fl.connect(g); g.connect(this.lp);
+      const rs = c.createGain(); rs.gain.value = 0.35; g.connect(rs); rs.connect(this.verb);
+      o.start(st); o.stop(st + dur + 0.04);
     });
-    requestAnimationFrame(drawParts);
+    if (i > 0) { /* soft whoosh */
+      const s = c.createBufferSource(); s.buffer = this.noise;
+      const f = c.createBiquadFilter(); f.type = "bandpass"; f.Q.value = 0.9;
+      f.frequency.setValueAtTime(500, t); f.frequency.exponentialRampToValueAtTime(3200, t + 0.3);
+      const g = c.createGain();
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.035, t + 0.09);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.32);
+      s.connect(f); f.connect(g); g.connect(this.lp); s.start(t); s.stop(t + 0.34);
+    }
+  },
+
+  chime: function () {
+    if (!this.ctx || this.muted) return;
+    const c = this.ctx, t = c.currentTime + 0.01;
+    [659.25, 830.61, 987.77].forEach((f, k) => {
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = "sine"; o.frequency.value = f;
+      const st = t + k * 0.09;
+      g.gain.setValueAtTime(0.0001, st);
+      g.gain.linearRampToValueAtTime(0.07, st + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 0.6);
+      o.connect(g); g.connect(this.lp);
+      const rs = c.createGain(); rs.gain.value = 0.4; g.connect(rs); rs.connect(this.verb);
+      o.start(st); o.stop(st + 0.65);
+    });
+  },
+
+  setMuted: function (m) {
+    this.muted = m;
+    if (this.ctx && this.master) {
+      const t = this.ctx.currentTime;
+      this.master.gain.cancelScheduledValues(t);
+      this.master.gain.setTargetAtTime(m ? 0 : 1, t, 0.05);
+      if (!m && this.ctx.state === "suspended") this.ctx.resume();
+    }
+    if (m) this.clearTimers();
+  },
+
+  clearTimers: function () {
+    this.timers.forEach(id => clearTimeout(id));
+    this.timers = [];
+  },
+
+  dispose: function () {
+    this.disposed = true;
+    this.clearTimers();
+    if (this.musTimer) { clearTimeout(this.musTimer); this.musTimer = null; }
+    if (this.pad) this.pad.forEach(o => { try { o.stop(); } catch (e) {} });
+    if (this.ctx) { try { this.ctx.close(); } catch (e) {} }
+    this.ctx = null;
   }
+};
 
-  sizeCanvas(); initParts();
-  if (!reduced) drawParts();
-  window.addEventListener('resize', ()=>{ sizeCanvas(); initParts(); });
+/* ============================================================
+   SCENE ENGINE (deterministic)
+   ============================================================ */
+let current = -1;
+let pendingTimers = [];
+const SFX_EVENTS = []; // export-audio uchun
 
-  /* ================================================================
-     START
-     ================================================================ */
-  renderAt(0);
-  requestAnimationFrame(tick);
+function sceneAt(ms) {
+  const t = clamp(ms, 0, TOTAL - 0.001);
+  for (let i = 0; i < DUR.length; i++) {
+    if (t < STARTS[i] + DUR[i] * 1000) return { i: i, local: (t - STARTS[i]) / (DUR[i] * 1000) };
+  }
+  return { i: DUR.length - 1, local: 0.999 };
+}
 
-  /* toza tozalash */
-  window.addEventListener('pagehide', ()=>{
-    clearSfxTimers();
-    AudioEngine.cleanup();
+function applyScene(i, withSfx) {
+  pendingTimers.forEach(id => clearTimeout(id));
+  pendingTimers = [];
+
+  scenes.forEach((s, k) => {
+    const on = k === i;
+    if (on) { s.classList.remove("is-active"); void s.offsetWidth; s.classList.add("is-active"); }
+    else { s.classList.remove("is-active"); }
+    s.setAttribute("aria-hidden", on ? "false" : "true");
   });
+
+  if (!withSfx || reduced) return;
+  Sound.scene(i);
+  scenes[i].querySelectorAll("[data-sfx-type]").forEach(el => {
+    const d = parseInt(el.getAttribute("data-sfx-delay") || "0", 10);
+    const type = el.getAttribute("data-sfx-type");
+    pendingTimers.push(setTimeout(() => Sound.sfx(type), d + 40));
+  });
+}
+
+function renderAt(ms, opts) {
+  const o = opts || {};
+  const r = sceneAt(ms);
+  if (r.i !== current) { current = r.i; applyScene(r.i, o.sfx !== false); }
+  for (let i = 0; i < bars.length; i++) {
+    const p = i < r.i ? 1 : (i === r.i ? clamp(r.local, 0, 1) : 0);
+    bars[i].style.transform = "scaleX(" + p.toFixed(4) + ")";
+  }
+}
+
+/* export/replay hooks */
+SFX_EVENTS.push({ time: 0, type: "chime" });
+DUR.forEach((d, i) => {
+  SFX_EVENTS.push({ time: STARTS[i], type: "scene", scene: i });
+  scenes[i].querySelectorAll("[data-sfx-delay]").forEach(el => {
+    SFX_EVENTS.push({
+      time: STARTS[i] + parseInt(el.getAttribute("data-sfx-delay") || "0", 10),
+      type: el.getAttribute("data-sfx-type")
+    });
+  });
+});
+window.__ad = { renderAt: renderAt, total: TOTAL, sfx: SFX_EVENTS, config: CONFIG };
+
+/* ============================================================
+   PLAYBACK LOOP
+   ============================================================ */
+let t0 = performance.now(), rafId = 0, lastDraw = 0;
+function loop(now) {
+  renderAt((now - t0) % TOTAL, { sfx: true });
+  if (now - lastDraw > 33) { lastDraw = now; drawParticles(); }
+  rafId = requestAnimationFrame(loop);
+}
+
+/* ============================================================
+   CONTROLS
+   ============================================================ */
+const soundBtn = $("#soundBtn");
+let buttonFirstTouch = false;
+function paintSound() {
+  soundBtn.classList.toggle("is-muted", Sound.muted);
+  soundBtn.setAttribute("aria-pressed", Sound.muted ? "false" : "true");
+  soundBtn.setAttribute("aria-label", Sound.muted ? "Ovozni yoqish" : "Ovozni o‘chirish");
+}
+window.addEventListener("pointerdown", function (e) {
+  if (e.target && e.target.closest && e.target.closest("#soundBtn")) buttonFirstTouch = true;
+  Sound.init();                       // first interaction unlocks audio, keeps sound-on state
+}, { capture: true });
+window.addEventListener("keydown", function () { Sound.init(); }, { once: true });
+soundBtn.addEventListener("click", function () {
+  Sound.init();
+  if (!buttonFirstTouch) { buttonFirstTouch = true; Sound.setMuted(false); }  // never mute on first press
+  else Sound.setMuted(!Sound.muted);
+  paintSound();
+});
+
+/* ============================================================
+   LIFECYCLE
+   ============================================================ */
+function onResize() { syncUnits(); initParticles(); }
+window.addEventListener("resize", onResize);
+window.addEventListener("orientationchange", onResize);
+window.addEventListener("pagehide", function () {
+  pendingTimers.forEach(id => clearTimeout(id));
+  Sound.dispose();
+  cancelAnimationFrame(rafId);
+});
+
+/* ============================================================
+   START
+   ============================================================ */
+syncUnits();
+initParticles();
+renderAt(0, { sfx: false });
+t0 = performance.now();
+rafId = requestAnimationFrame(loop);
+window.addEventListener("pointerdown", function once() { Sound.chime(); }, { once: true, capture: true });
+paintSound();
 })();
 </script>
 </body>
